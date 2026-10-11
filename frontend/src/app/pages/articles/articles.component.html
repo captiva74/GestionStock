@@ -1,0 +1,125 @@
+<div class="articles-page">
+  <h2>Gestion du matériel administratif</h2>
+
+  <p *ngIf="message" class="message-succes">{{ message }}</p>
+  <p *ngIf="erreur" class="message-erreur">{{ erreur }}</p>
+
+  <div class="barre-filtres">
+    <input
+      type="text"
+      placeholder="🔍 Rechercher (référence, nom, marque...)"
+      [(ngModel)]="recherche"
+      (ngModelChange)="surChangementFiltre()"
+      name="recherche"
+      class="champ-recherche">
+
+    <select
+      [(ngModel)]="categorieFiltre"
+      (ngModelChange)="surChangementFiltre()"
+      name="categorieFiltre">
+      <option value="">Toutes les catégories</option>
+      <option *ngFor="let cat of categoriesDisponibles" [value]="cat">{{ cat }}</option>
+    </select>
+
+    <select
+      [(ngModel)]="etatFiltre"
+      (ngModelChange)="surChangementFiltre()"
+      name="etatFiltre">
+      <option value="">Tous les états</option>
+      <option value="Neuf">Neuf</option>
+      <option value="Bon état">Bon état</option>
+      <option value="À réparer">À réparer</option>
+      <option value="En panne">En panne</option>
+      <option value="Réformé">Réformé</option>
+    </select>
+
+    <button type="button" (click)="reinitialiserFiltres()">Réinitialiser</button>
+  </div>
+
+  <div class="actions-export">
+  <button type="button" (click)="imprimer()">🖨️ Imprimer</button>
+  <button type="button" (click)="exporterPdf()">📄 Export PDF</button>
+  <button type="button" (click)="exporterExcel()">📊 Export Excel</button>
+  </div>
+
+  <h3>Inventaire du matériel</h3>
+
+  <p *ngIf="chargement">Chargement du matériel...</p>
+
+  <div class="table-container" *ngIf="!chargement && articles.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>N° d'inventaire</th>
+          <th>Désignation</th>
+          <th>Catégorie</th>
+          <th>Marque</th>
+          <th>Modèle</th>
+          <th>N° de série</th>
+          <th>Valeur d'acquisition</th>
+          <th>Service</th>
+          <th>Bureau</th>
+          <th>État</th>
+          <th *ngIf="authService.estAdmin()" class="colonne-actions">Actions</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let article of articlesAffiches">
+          <td>{{ article.id }}</td>
+          <td>{{ article.reference || '—' }}</td>
+          <td>{{ article.nom }}</td>
+          <td>{{ article.categorie?.nom || article.categorieId }}</td>
+          <td>{{ article.marque || '—' }}</td>
+          <td>{{ article.modele || '—' }}</td>
+          <td>{{ article.numeroSerie || '—' }}</td>
+          <td>{{ article.valeurAcquisition | number:'1.2-2' }}</td>
+          <td>{{ article.serviceAffectation || '—' }}</td>
+          <td>{{ article.bureauAffectation || '—' }}</td>
+          <td>{{ article.etat }}</td>
+          <td *ngIf="authService.estAdmin()" class="colonne-actions">
+            <a [routerLink]="['/articles/nouveau']" [queryParams]="{ id: article.id }">
+              <button type="button">Modifier</button>
+            </a>
+            <button type="button" (click)="supprimerArticle(article)" style="margin-left: 6px; background: #c62828;">
+              Supprimer
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination" *ngIf="!chargement && articlesFiltres.length > 0">
+      <span class="info-pagination">
+        {{ articlesFiltres.length }} résultat(s) — page {{ pageActuelle }} / {{ totalPages }}
+      </span>
+
+      <div class="controles-pagination">
+        <button type="button" (click)="pagePrecedente()" [disabled]="pageActuelle === 1">←</button>
+
+        <button
+          type="button"
+          *ngFor="let page of pagesAffichables"
+          (click)="allerPage(page)"
+          [class.page-active]="page === pageActuelle">
+          {{ page }}
+        </button>
+
+        <button type="button" (click)="pageSuivante()" [disabled]="pageActuelle === totalPages">→</button>
+      </div>
+
+      <select [(ngModel)]="taillePage" (ngModelChange)="surChangementFiltre()" name="taillePage">
+        <option *ngFor="let taille of taillesPageDisponibles" [value]="taille">{{ taille }} / page</option>
+      </select>
+    </div>
+
+  <p *ngIf="!chargement && articlesFiltres.length === 0">
+    Aucun résultat ne correspond à votre recherche.
+  </p>
+  </div>
+
+  <p *ngIf="!chargement && articles.length === 0">
+    Aucun matériel trouvé.
+  </p>
+</div>

@@ -1,0 +1,202 @@
+<div class="articles-page">
+  <h2>{{ articleId !== null ? 'Modifier le matériel' : 'Ajouter un matériel' }}</h2>
+
+  <p *ngIf="chargement">Chargement du matériel...</p>
+
+  <div class="formulaire" *ngIf="!chargement">
+    <form (ngSubmit)="enregistrer()">
+      <div class="grille">
+
+        <div class="champ" *ngIf="nouvelArticle.typeGestion === TypeGestionArticle.MaterielIndividuel">
+          <label for="reference">N° d'inventaire *</label>
+          <input
+            id="reference"
+            name="reference"
+            [(ngModel)]="nouvelArticle.reference"
+            required
+            maxlength="50"
+            placeholder="Ex. INV-2026-001">
+        </div>
+
+        <div class="champ">
+          <label for="nom">Désignation *</label>
+          <input
+            id="nom"
+            name="nom"
+            [(ngModel)]="nouvelArticle.nom"
+            required
+            maxlength="150"
+            placeholder="Ex. Ordinateur HP">
+        </div>
+
+        <div class="champ">
+          <label for="categorieId">Catégorie *</label>
+          <select
+            id="categorieId"
+            name="categorieId"
+            [(ngModel)]="nouvelArticle.categorieId"
+            required>
+            <option [ngValue]="0" disabled>Choisir une catégorie</option>
+            <option *ngFor="let categorie of categories" [ngValue]="categorie.id">
+              {{ categorie.nom }}
+            </option>
+          </select>
+        </div>
+
+        <div class="champ">
+          <label for="typeGestion">Type de gestion *</label>
+          <select
+            id="typeGestion"
+            name="typeGestion"
+            [(ngModel)]="nouvelArticle.typeGestion"
+            required>
+            <option [ngValue]="TypeGestionArticle.MaterielIndividuel">Matériel individuel</option>
+            <option [ngValue]="TypeGestionArticle.Fourniture">Fourniture (gérée en stock)</option>
+          </select>
+        </div>
+
+        <ng-container *ngIf="nouvelArticle.typeGestion === TypeGestionArticle.Fourniture">
+          <div class="champ" *ngIf="articleId === null">
+            <label for="quantiteStock">Quantité initiale en stock *</label>
+            <input
+              id="quantiteStock"
+              name="quantiteStock"
+              type="number"
+              min="0"
+              step="1"
+              [(ngModel)]="nouvelArticle.quantiteStock"
+              required>
+          </div>
+
+          <div class="champ">
+            <label for="seuilMinimum">Seuil minimum d'alerte</label>
+            <input
+              id="seuilMinimum"
+              name="seuilMinimum"
+              type="number"
+              min="0"
+              step="1"
+              [(ngModel)]="nouvelArticle.seuilMinimum">
+          </div>
+        </ng-container>
+
+        <div class="champ">
+          <label for="marque">Marque</label>
+          <input
+            id="marque"
+            name="marque"
+            [(ngModel)]="nouvelArticle.marque"
+            maxlength="100"
+            placeholder="Ex. HP">
+        </div>
+
+        <div class="champ">
+          <label for="modele">Modèle</label>
+          <input
+            id="modele"
+            name="modele"
+            [(ngModel)]="nouvelArticle.modele"
+            maxlength="100"
+            placeholder="Ex. ProBook">
+        </div>
+
+        <div class="champ">
+          <label for="numeroSerie">Numéro de série</label>
+          <input
+            id="numeroSerie"
+            name="numeroSerie"
+            [(ngModel)]="nouvelArticle.numeroSerie"
+            maxlength="100"
+            placeholder="Numéro indiqué sur le matériel">
+        </div>
+
+        <div class="champ">
+          <label for="dateAcquisition">Date d'acquisition</label>
+          <input
+            id="dateAcquisition"
+            name="dateAcquisition"
+            type="date"
+            [(ngModel)]="nouvelArticle.dateAcquisition">
+        </div>
+
+        <div class="champ">
+          <label for="valeurAcquisition">Valeur d'acquisition *</label>
+          <input
+            id="valeurAcquisition"
+            name="valeurAcquisition"
+            type="number"
+            min="0"
+            step="0.01"
+            [(ngModel)]="nouvelArticle.valeurAcquisition"
+            required>
+        </div>
+
+        <div class="champ">
+          <label for="serviceAffectation">Service d'affectation</label>
+          <input
+            id="serviceAffectation"
+            name="serviceAffectation"
+            [(ngModel)]="nouvelArticle.serviceAffectation"
+            maxlength="150"
+            placeholder="Ex. Service informatique">
+        </div>
+
+        <div class="champ">
+          <label for="bureauAffectation">Bureau d'affectation</label>
+          <input
+            id="bureauAffectation"
+            name="bureauAffectation"
+            [(ngModel)]="nouvelArticle.bureauAffectation"
+            maxlength="100"
+            placeholder="Ex. Bureau 12">
+        </div>
+
+        <div class="champ">
+          <label for="etat">État du matériel *</label>
+          <select
+            id="etat"
+            name="etat"
+            [(ngModel)]="nouvelArticle.etat"
+            required>
+            <option value="Neuf">Neuf</option>
+            <option value="Bon état">Bon état</option>
+            <option value="À réparer">À réparer</option>
+            <option value="En panne">En panne</option>
+            <option value="Réformé">Réformé</option>
+          </select>
+        </div>
+
+        <div class="champ">
+          <label for="observations">Observations</label>
+          <textarea
+            id="observations"
+            name="observations"
+            [(ngModel)]="nouvelArticle.observations"
+            maxlength="500"
+            rows="3"
+            placeholder="Informations complémentaires"></textarea>
+        </div>
+
+      </div>
+
+      <button type="submit" [disabled]="enregistrement">
+        {{
+          enregistrement
+            ? 'Enregistrement...'
+            : (articleId !== null ? 'Enregistrer les modifications' : 'Ajouter le matériel')
+        }}
+      </button>
+
+      <button
+        type="button"
+        (click)="annuler()"
+        [disabled]="enregistrement"
+        style="margin-left: 8px;">
+        Annuler
+      </button>
+    </form>
+
+    <p *ngIf="message" class="message-succes">{{ message }}</p>
+    <p *ngIf="erreur" class="message-erreur">{{ erreur }}</p>
+  </div>
+</div>

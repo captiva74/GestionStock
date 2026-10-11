@@ -1,0 +1,58 @@
+<div class="page">
+  <h2>Mon profil</h2>
+
+  <p *ngIf="chargement">Chargement du profil...</p>
+
+  <div class="formulaire" *ngIf="!chargement">
+    <h3>Informations personnelles</h3>
+
+    <form (ngSubmit)="enregistrerProfil()">
+      <div class="champ">
+        <label for="nomComplet">Nom complet</label>
+        <input id="nomComplet" name="nomComplet" type="text" [(ngModel)]="nomComplet" required>
+      </div>
+
+      <div class="champ">
+        <label for="email">Email</label>
+        <input id="email" name="email" type="email" [(ngModel)]="email" required>
+      </div>
+
+      <p *ngIf="profil" class="info-role">Rôle : <strong>{{ profil.role }}</strong></p>
+
+      <button type="submit" [disabled]="enregistrementProfil">
+        {{ enregistrementProfil ? 'Enregistrement...' : 'Enregistrer les modifications' }}
+      </button>
+    </form>
+
+    <p *ngIf="messageProfil" class="succes">{{ messageProfil }}</p>
+    <p *ngIf="erreurProfil" class="erreur">{{ erreurProfil }}</p>
+  </div>
+
+  <div class="formulaire" *ngIf="!chargement">
+    <h3>Changer le mot de passe</h3>
+
+    <form (ngSubmit)="changerMotDePasse()">
+      <div class="champ">
+        <label for="ancienMotDePasse">Mot de passe actuel</label>
+        <input id="ancienMotDePasse" name="ancienMotDePasse" type="password" [(ngModel)]="ancienMotDePasse" required>
+      </div>
+
+      <div class="champ">
+        <label for="nouveauMotDePasse">Nouveau mot de passe</label>
+        <input id="nouveauMotDePasse" name="nouveauMotDePasse" type="password" [(ngModel)]="nouveauMotDePasse" required minlength="6">
+      </div>
+
+      <div class="champ">
+        <label for="confirmation">Confirmer le nouveau mot de passe</label>
+        <input id="confirmation" name="confirmation" type="password" [(ngModel)]="confirmation" required>
+      </div>
+
+      <button type="submit" [disabled]="enregistrementMotDePasse">
+        {{ enregistrementMotDePasse ? 'Enregistrement...' : 'Changer le mot de passe' }}
+      </button>
+    </form>
+
+    <p *ngIf="messageMotDePasse" class="succes">{{ messageMotDePasse }}</p>
+    <p *ngIf="erreurMotDePasse" class="erreur">{{ erreurMotDePasse }}</p>
+  </div>
+</div>

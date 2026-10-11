@@ -1,0 +1,87 @@
+<div class="page">
+  <h2>Gestion des catégories</h2>
+
+  <p class="succes" *ngIf="message">{{ message }}</p>
+  <p class="erreur" *ngIf="erreur">{{ erreur }}</p>
+
+  <div class="barre-filtres">
+    <input
+      type="text"
+      placeholder="🔍 Rechercher (nom, description...)"
+      [(ngModel)]="recherche"
+      (ngModelChange)="surChangementFiltre()"
+      name="recherche"
+      class="champ-recherche">
+
+    <button type="button" (click)="reinitialiserFiltres()">Réinitialiser</button>
+  </div>
+
+  <div class="actions-export">
+  <button type="button" (click)="imprimer()">🖨️ Imprimer</button>
+  <button type="button" (click)="exporterPdf()">📄 Export PDF</button>
+  <button type="button" (click)="exporterExcel()">📊 Export Excel</button>
+  </div>
+
+  <h3>Liste des catégories</h3>
+
+  <p *ngIf="chargement">Chargement des catégories...</p>
+
+  <table *ngIf="!chargement && categories.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Description</th>
+        <th *ngIf="authService.estAdmin()"class="colonne-actions">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let categorie of categoriesAffichees">
+        <td>{{ categorie.id }}</td>
+        <td>{{ categorie.nom }}</td>
+        <td>{{ categorie.description }}</td>
+        <td *ngIf="authService.estAdmin()"class="colonne-actions">
+          <button
+            type="button"
+            (click)="supprimerCategorie(categorie)"
+            style="background: #c62828;">
+            Supprimer
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+    <div class="pagination" *ngIf="!chargement && categoriesFiltrees.length > 0">
+    <span class="info-pagination">
+      {{ categoriesFiltrees.length }} résultat(s) — page {{ pageActuelle }} / {{ totalPages }}
+    </span>
+
+    <div class="controles-pagination">
+      <button type="button" (click)="pagePrecedente()" [disabled]="pageActuelle === 1">←</button>
+
+      <button
+        type="button"
+        *ngFor="let page of pagesAffichables"
+        (click)="allerPage(page)"
+        [class.page-active]="page === pageActuelle">
+        {{ page }}
+      </button>
+
+      <button type="button" (click)="pageSuivante()" [disabled]="pageActuelle === totalPages">→</button>
+    </div>
+
+    <select [(ngModel)]="taillePage" (ngModelChange)="surChangementFiltre()" name="taillePage">
+      <option *ngFor="let taille of taillesPageDisponibles" [value]="taille">{{ taille }} / page</option>
+    </select>
+  </div>
+
+  <p *ngIf="!chargement && categoriesFiltrees.length === 0">
+    Aucun résultat ne correspond à votre recherche.
+  </p>
+
+  <p *ngIf="!chargement && categories.length === 0">
+    Aucune catégorie enregistrée.
+  </p>
+</div>

@@ -1,0 +1,94 @@
+.auth-page {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  padding: 20px;
+  background: #f3f6fb;
+}
+
+.auth-carte {
+  width: 100%;
+  max-width: 420px;
+  padding: 32px;
+  background: white;
+  border: 1px solid #dce3eb;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+}
+
+.auth-carte h2 {
+  margin-bottom: 24px;
+  color: #1e3a5f;
+  text-align: center;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.champ label {
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.champ input {
+  padding: 11px;
+  border: 1px solid #bdc7d1;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+button[type="submit"] {
+  width: 100%;
+  padding: 12px;
+  color: white;
+  background: #1769aa;
+  border: none;
+  border-radius: 5px;
+  font-size: 15px;
+  cursor: pointer;
+  margin-top: 6px;
+}
+
+button[type="submit"]:hover {
+  background: #0d4f86;
+}
+
+button[type="submit"]:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.message-erreur {
+  margin-top: 14px;
+  color: #c62828;
+  font-size: 14px;
+  text-align: center;
+}
+
+.message-succes {
+  margin-top: 14px;
+  color: #218838;
+  font-size: 14px;
+  text-align: center;
+}
+
+.auth-liens {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+  font-size: 13px;
+}
+
+.auth-liens a {
+  color: #1769aa;
+  text-decoration: none;
+}
+
+.auth-liens a:hover {
+  text-decoration: underline;
+}

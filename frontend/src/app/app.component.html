@@ -1,0 +1,121 @@
+<div class="app-layout" *ngIf="authService.estConnecte(); else pageAuth">
+  <aside class="sidebar">
+    <div class="brand">
+      <img src="/logo.jpg" alt="Logo CASNOS" class="brand-icon">
+      <div>
+        <h2>GestionStock CASNOS</h2>
+        <span>Gestion du matériel</span>
+      </div>
+    </div>
+
+    <div class="menu-title">MENU PRINCIPAL</div>
+
+    <nav class="navigation">
+      <button
+        type="button"
+        class="menu-parent"
+        [class.active]="menuArticlesActif"
+        (click)="basculerMenuArticles()">
+        <span class="nav-left">
+          <span class="nav-icon">▦</span>
+          <span>Articles</span>
+        </span>
+        <span class="nav-chevron" [class.ouvert]="menuArticlesOuvert">▾</span>
+      </button>
+
+      <div class="sous-menu" *ngIf="menuArticlesOuvert">
+        <a routerLink="/articles/inventaire" routerLinkActive="active" class="sous-item">
+          <span class="nav-icon">📋</span>
+          <span>Inventaire</span>
+        </a>
+        <a routerLink="/articles/stock" routerLinkActive="active" class="sous-item">
+          <span class="nav-icon">📦</span>
+          <span>Stock & alertes</span>
+          <span class="badge-alerte" *ngIf="nombreAlertesStock > 0">{{ nombreAlertesStock }}</span>
+        </a>
+        <a
+          *ngIf="authService.estAdmin()"
+          routerLink="/articles/nouveau"
+          routerLinkActive="active"
+          class="sous-item">
+          <span class="nav-icon">➕</span>
+          <span>Ajouter un matériel</span>
+        </a>
+      </div>
+
+      <button
+        type="button"
+        class="menu-parent"
+        [class.active]="menuCategoriesActif"
+        (click)="basculerMenuCategories()">
+        <span class="nav-left">
+          <span class="nav-icon">▤</span>
+          <span>Catégories</span>
+        </span>
+        <span class="nav-chevron" [class.ouvert]="menuCategoriesOuvert">▾</span>
+      </button>
+
+      <div class="sous-menu" *ngIf="menuCategoriesOuvert">
+        <a routerLink="/categories/liste" routerLinkActive="active" class="sous-item">
+          <span class="nav-icon">📋</span>
+          <span>Liste</span>
+        </a>
+        <a
+          *ngIf="authService.estAdmin()"
+          routerLink="/categories/nouveau"
+          routerLinkActive="active"
+          class="sous-item">
+          <span class="nav-icon">➕</span>
+          <span>Ajouter une catégorie</span>
+        </a>
+      </div>
+
+      <a routerLink="/mouvements-stock" routerLinkActive="active">
+        <span class="nav-icon">⇄</span>
+        <span>Mouvements de stock</span>
+      </a>
+
+      <a *ngIf="authService.estAdmin()" routerLink="/admin/journal" routerLinkActive="active">
+        <span class="nav-icon">📜</span>
+        <span>Journal d'activité</span>
+      </a>
+
+      <a *ngIf="authService.estAdmin()" routerLink="/admin/utilisateurs" routerLinkActive="active">
+        <span class="nav-icon">👥</span>
+        <span>Utilisateurs</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-footer">
+      <span class="status-dot"></span>
+      Application CASNOS
+    </div>
+  </aside>
+
+  <main class="main-area">
+    <header class="topbar">
+      <div>
+        <h1>Gestion du stock</h1>
+        <p>Suivez et gérez votre matériel et vos fournitures.</p>
+      </div>
+
+      <div class="menu-utilisateur">
+        <a routerLink="/profil" class="lien-profil">
+          <div class="user-avatar">{{ authService.utilisateurCourant?.nomComplet?.charAt(0) }}</div>
+          <span>{{ authService.utilisateurCourant?.nomComplet }}</span>
+        </a>
+        <button type="button" (click)="seDeconnecter()" class="btn-deconnexion">
+          Déconnexion
+        </button>
+      </div>
+    </header>
+
+    <section class="page-content">
+      <router-outlet></router-outlet>
+    </section>
+  </main>
+</div>
+
+<ng-template #pageAuth>
+  <router-outlet></router-outlet>
+</ng-template>

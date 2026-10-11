@@ -1,0 +1,73 @@
+<div class="page">
+  <h2>Gestion des utilisateurs</h2>
+
+  <p class="succes" *ngIf="message">{{ message }}</p>
+  <p class="erreur" *ngIf="erreur">{{ erreur }}</p>
+
+  <div class="formulaire" *ngIf="utilisateurEnEditionId !== null">
+    <h3>Modifier l'utilisateur</h3>
+
+    <form (ngSubmit)="enregistrer()">
+      <div class="champ">
+        <label>Nom complet</label>
+        <input type="text" name="nomComplet" [(ngModel)]="edition.nomComplet" required>
+      </div>
+
+      <div class="champ">
+        <label>Email</label>
+        <input type="email" name="email" [(ngModel)]="edition.email" required>
+      </div>
+
+      <div class="champ">
+        <label>Rôle</label>
+        <select name="role" [(ngModel)]="edition.role">
+          <option [ngValue]="0">Admin</option>
+          <option [ngValue]="1">Utilisateur</option>
+        </select>
+      </div>
+
+      <div class="champ">
+        <label>
+          <input type="checkbox" name="estActif" [(ngModel)]="edition.estActif">
+          Compte actif
+        </label>
+      </div>
+
+      <button type="submit">Enregistrer</button>
+      <button type="button" (click)="annuler()" style="margin-left: 8px;">Annuler</button>
+    </form>
+  </div>
+
+  <p *ngIf="chargement">Chargement des utilisateurs...</p>
+
+  <table *ngIf="!chargement && utilisateurs.length > 0">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Nom</th>
+        <th>Email</th>
+        <th>Rôle</th>
+        <th>Statut</th>
+        <th>Créé le</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let utilisateur of utilisateurs">
+        <td>{{ utilisateur.id }}</td>
+        <td>{{ utilisateur.nomComplet }}</td>
+        <td>{{ utilisateur.email }}</td>
+        <td>{{ utilisateur.role }}</td>
+        <td>{{ utilisateur.estActif ? 'Actif' : 'Désactivé' }}</td>
+        <td>{{ utilisateur.dateCreation | date:'dd/MM/yyyy' }}</td>
+        <td>
+          <button type="button" (click)="modifier(utilisateur)">Modifier</button>
+          <button type="button" (click)="supprimer(utilisateur)" style="margin-left: 6px; background: #c62828;">
+            Supprimer
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>

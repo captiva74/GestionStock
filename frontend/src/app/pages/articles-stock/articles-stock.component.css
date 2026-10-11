@@ -1,0 +1,103 @@
+.stock-page {
+  max-width: 1000px;
+  margin: 25px auto;
+  padding: 20px;
+  color: #263238;
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  margin-bottom: 25px;
+  color: #1e3a5f;
+}
+
+.resume {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 25px;
+}
+
+.carte {
+  flex: 1;
+  padding: 18px;
+  text-align: center;
+  background: #f5f7fa;
+  border: 1px solid #dce3eb;
+  border-radius: 8px;
+}
+
+.carte-valeur {
+  display: block;
+  margin-bottom: 6px;
+  color: #1e3a5f;
+  font-size: 28px;
+  font-weight: 800;
+}
+
+.carte-label {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.carte-alerte.actif {
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+
+.carte-alerte.actif .carte-valeur {
+  color: #c62828;
+}
+
+.table-container {
+  width: 100%;
+  overflow-x: auto;
+  border: 1px solid #dce3eb;
+  border-radius: 6px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: white;
+}
+
+th, td {
+  padding: 12px;
+  border: 1px solid #dce3eb;
+  text-align: left;
+}
+
+th {
+  color: white;
+  background: #1e3a5f;
+}
+
+tbody tr:nth-child(even) {
+  background: #f5f7fa;
+}
+
+.ligne-alerte {
+  background: #fef2f2 !important;
+}
+
+.badge-statut {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.badge-danger {
+  color: #c62828;
+  background: #fde8e8;
+}
+
+.badge-ok {
+  color: #218838;
+  background: #e6f4ea;
+}
+
+.message-erreur {
+  color: #c62828;
+}

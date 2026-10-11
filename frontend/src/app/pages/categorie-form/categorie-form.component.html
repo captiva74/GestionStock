@@ -1,0 +1,43 @@
+<div class="page">
+  <h2>Ajouter une catégorie</h2>
+
+  <div class="formulaire">
+    <form (ngSubmit)="ajouterCategorie()">
+      <div class="champ">
+        <label for="nom">Nom de la catégorie</label>
+        <input
+          id="nom"
+          type="text"
+          name="nom"
+          [(ngModel)]="nouvelleCategorie.nom"
+          required
+          placeholder="Ex. Informatique"
+        />
+      </div>
+
+      <div class="champ">
+        <label for="description">Description</label>
+        <textarea
+          id="description"
+          name="description"
+          [(ngModel)]="nouvelleCategorie.description"
+          placeholder="Description de la catégorie"
+        ></textarea>
+      </div>
+
+      <button type="submit" [disabled]="enregistrement">
+        {{ enregistrement ? 'Enregistrement...' : 'Ajouter la catégorie' }}
+      </button>
+
+      <button
+        type="button"
+        (click)="annuler()"
+        [disabled]="enregistrement"
+        style="margin-left: 8px;">
+        Annuler
+      </button>
+    </form>
+
+    <p class="erreur" *ngIf="erreur">{{ erreur }}</p>
+  </div>
+</div>

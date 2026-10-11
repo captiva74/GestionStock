@@ -1,0 +1,160 @@
+.page {
+max-width: 1000px;
+margin: 30px auto;
+padding: 24px;
+font-family: Arial, sans-serif;
+color: #263238;
+}
+
+h2 {
+margin-bottom: 25px;
+color: #1e3a5f;
+}
+
+h3 {
+margin-bottom: 18px;
+}
+
+.formulaire {
+padding: 22px;
+margin-bottom: 30px;
+background: #f5f7fa;
+border: 1px solid #dce3eb;
+border-radius: 8px;
+}
+
+.champ {
+display: flex;
+flex-direction: column;
+margin-bottom: 16px;
+}
+
+.champ label {
+margin-bottom: 7px;
+font-weight: bold;
+}
+
+.champ input,
+.champ textarea {
+padding: 11px;
+border: 1px solid #bdc7d1;
+border-radius: 5px;
+font-size: 15px;
+}
+
+.champ textarea {
+min-height: 80px;
+resize: vertical;
+}
+
+button {
+padding: 11px 18px;
+color: white;
+background: #1769aa;
+border: none;
+border-radius: 5px;
+cursor: pointer;
+font-size: 15px;
+}
+
+button:hover {
+background: #0d4f86;
+}
+
+table {
+width: 100%;
+border-collapse: collapse;
+margin-top: 15px;
+background: white;
+}
+
+th,
+td {
+padding: 12px;
+text-align: left;
+border: 1px solid #dce3eb;
+}
+
+th {
+color: white;
+background: #1e3a5f;
+}
+
+tbody tr:nth-child(even) {
+background: #f5f7fa;
+}
+
+.erreur {
+color: #c62828;
+margin-top: 12px;
+}
+
+.succes {
+color: #218838;
+margin-top: 12px;
+}
+
+.actions-export {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.barre-filtres {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.champ-recherche {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 12px;
+  border: 1px solid #bdc7d1;
+  border-radius: 5px;
+  font-size: 14px;
+}
+
+.barre-filtres select {
+  padding: 10px 12px;
+  border: 1px solid #bdc7d1;
+  border-radius: 5px;
+  font-size: 14px;
+  background: white;
+}
+
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.info-pagination {
+  color: #64748b;
+  font-size: 13px;
+}
+
+.controles-pagination {
+  display: flex;
+  gap: 4px;
+}
+
+.controles-pagination button {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.controles-pagination button.page-active {
+  background: #0d4f86;
+  font-weight: bold;
+}
+
+.pagination select {
+  padding: 6px 10px;
+  border: 1px solid #bdc7d1;
+  border-radius: 5px;
+}

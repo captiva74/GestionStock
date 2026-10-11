@@ -1,0 +1,54 @@
+<div class="stock-page">
+  <h2>Suivi du stock des fournitures</h2>
+
+  <p *ngIf="chargement">Chargement du stock...</p>
+  <p *ngIf="erreur" class="message-erreur">{{ erreur }}</p>
+
+  <div class="resume" *ngIf="!chargement && articles.length > 0">
+    <div class="carte">
+      <span class="carte-valeur">{{ articles.length }}</span>
+      <span class="carte-label">Fournitures suivies</span>
+    </div>
+    <div class="carte carte-alerte" [class.actif]="articlesEnAlerte.length > 0">
+      <span class="carte-valeur">{{ articlesEnAlerte.length }}</span>
+      <span class="carte-label">En alerte de stock</span>
+    </div>
+  </div>
+
+  <div class="table-container" *ngIf="!chargement && articles.length > 0">
+    <table>
+      <thead>
+        <tr>
+          <th>Référence</th>
+          <th>Désignation</th>
+          <th>Catégorie</th>
+          <th>Stock actuel</th>
+          <th>Seuil minimum</th>
+          <th>Statut</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        <tr *ngFor="let article of articles" [class.ligne-alerte]="article.quantiteStock <= article.seuilMinimum">
+          <td>{{ article.reference || '—' }}</td>
+          <td>{{ article.nom }}</td>
+          <td>{{ article.categorie?.nom || article.categorieId }}</td>
+          <td>{{ article.quantiteStock }}</td>
+          <td>{{ article.seuilMinimum }}</td>
+          <td>
+            <span *ngIf="article.quantiteStock <= article.seuilMinimum" class="badge-statut badge-danger">
+              ⚠️ Stock bas
+            </span>
+            <span *ngIf="article.quantiteStock > article.seuilMinimum" class="badge-statut badge-ok">
+              OK
+            </span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <p *ngIf="!chargement && articles.length === 0">
+    Aucune fourniture enregistrée pour le moment.
+  </p>
+</div>

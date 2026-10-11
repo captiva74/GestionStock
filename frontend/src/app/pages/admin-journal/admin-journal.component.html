@@ -1,0 +1,54 @@
+<div class="page">
+  <h2>Journal d'activité</h2>
+
+  <div class="barre-filtres">
+    <select [(ngModel)]="entiteFiltre" name="entiteFiltre">
+      <option value="">Toutes les entités</option>
+      <option value="Article">Article</option>
+      <option value="Catégorie">Catégorie</option>
+      <option value="Mouvement de stock">Mouvement de stock</option>
+    </select>
+
+    <select [(ngModel)]="actionFiltre" name="actionFiltre">
+      <option value="">Toutes les actions</option>
+      <option value="Création">Création</option>
+      <option value="Modification">Modification</option>
+      <option value="Suppression">Suppression</option>
+    </select>
+
+    <input type="date" [(ngModel)]="dateDebut" name="dateDebut" title="Date de début">
+    <input type="date" [(ngModel)]="dateFin" name="dateFin" title="Date de fin">
+
+    <button type="button" (click)="charger()">Filtrer</button>
+    <button type="button" (click)="reinitialiser()">Réinitialiser</button>
+  </div>
+
+  <p *ngIf="chargement">Chargement du journal...</p>
+  <p *ngIf="erreur" class="erreur">{{ erreur }}</p>
+
+  <table *ngIf="!chargement && entrees.length > 0">
+    <thead>
+      <tr>
+        <th>Date</th>
+        <th>Utilisateur</th>
+        <th>Action</th>
+        <th>Entité</th>
+        <th>Détails</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr *ngFor="let entree of entrees">
+        <td>{{ entree.dateAction | date:'dd/MM/yyyy HH:mm' }}</td>
+        <td>{{ entree.nomUtilisateur }}</td>
+        <td>{{ entree.action }}</td>
+        <td>{{ entree.entite }}</td>
+        <td>{{ entree.details || '—' }}</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <p *ngIf="!chargement && entrees.length === 0">
+    Aucune activité trouvée pour ces critères.
+  </p>
+</div>
