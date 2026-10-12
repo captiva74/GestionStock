@@ -101,9 +101,29 @@ export class AuthService {
     this.utilisateurCourantSubject.next(reponse);
   }
 
+    // Agence consultée par l'admin du siège (null = sa propre agence)
+  private readonly cleAgenceChoisie = 'gs_agence_choisie';
+
+  getAgenceChoisie(): number | null {
+    if (!this.estSuperAdmin()) {
+      return null;
+    }
+    const valeur = Number(localStorage.getItem(this.cleAgenceChoisie));
+    return Number.isInteger(valeur) && valeur >= 201 && valeur <= 269 ? valeur : null;
+  }
+
+  choisirAgence(codeStructure: number | null): void {
+    if (codeStructure === null) {
+      localStorage.removeItem(this.cleAgenceChoisie);
+    } else {
+      localStorage.setItem(this.cleAgenceChoisie, String(codeStructure));
+    }
+  }
+
   deconnexion(): void {
     localStorage.removeItem(this.cleToken);
     localStorage.removeItem(this.cleUtilisateur);
+    localStorage.removeItem(this.cleAgenceChoisie);
     this.utilisateurCourantSubject.next(null);
   }
 

@@ -321,3 +321,17 @@
 .btn-deconnexion:hover {
   background: #a01f1f;
 }
+
+.choix-agence {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-right: 16px;
+}
+
+.choix-agence select {
+  padding: 6px 10px;
+  border: 1px solid #bdc7d1;
+  border-radius: 5px;
+  background: white;
+}

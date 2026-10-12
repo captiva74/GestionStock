@@ -1,111 +1,303 @@
-<div class="mouvements-page">
-  <h2>Gestion des mouvements de stock</h2>
+<div class="mouvements-page page">
 
-  <div class="formulaire">
-    <h3>Enregistrer un mouvement</h3>
+  <!-- PAGE : AJOUTER UN MOUVEMENT -->
+  <div *ngIf="mode === 'nouveau'">
+    <h2>Ajouter un mouvement de stock</h2>
 
-    <form (ngSubmit)="ajouterMouvement()">
-      <div class="grille">
+    <div class="formulaire">
+      <h3>Enregistrer un mouvement</h3>
 
-        <div class="champ">
-          <label for="articleId">Article (fourniture) *</label>
-          <select
-            id="articleId"
-            name="articleId"
-            [(ngModel)]="nouveauMouvement.articleId"
-            required>
-            <option [ngValue]="0" disabled>Choisir une fourniture</option>
-            <option *ngFor="let article of articlesFournitures" [ngValue]="article.id">
-              {{ article.nom }} ({{ article.reference }}) — Stock : {{ article.quantiteStock }}
-            </option>
-          </select>
-          <p *ngIf="articlesFournitures.length === 0" class="info">
-            Aucune fourniture disponible. Seuls les articles de type « Fourniture » peuvent avoir des mouvements de stock.
-          </p>
+      <form (ngSubmit)="ajouterMouvement()">
+        <div class="grille">
+
+          <!-- ARTICLE -->
+          <div class="champ">
+            <label for="articleId">Article (fourniture) *</label>
+
+            <select
+              id="articleId"
+              name="articleId"
+              [(ngModel)]="nouveauMouvement.articleId"
+              required>
+              <option [ngValue]="0" disabled>
+                Choisir une fourniture
+              </option>
+
+              <option
+                *ngFor="let article of articlesFournitures"
+                [ngValue]="article.id">
+                {{ article.nom }} ({{ article.reference }}) —
+                Stock : {{ article.quantiteStock }}
+              </option>
+            </select>
+
+            <p *ngIf="articlesFournitures.length === 0" class="info">
+              Aucune fourniture disponible. Seuls les articles de type
+              « Fourniture » peuvent avoir des mouvements de stock.
+            </p>
+          </div>
+
+          <!-- TYPE DE MOUVEMENT -->
+          <div class="champ">
+            <label for="typeMouvement">Type de mouvement *</label>
+
+            <select
+              id="typeMouvement"
+              name="typeMouvement"
+              [(ngModel)]="nouveauMouvement.typeMouvement"
+              (ngModelChange)="changerTypeMouvement()"
+              required>
+              <option [ngValue]="TypeMouvementStock.Entree">
+                Entrée
+              </option>
+              <option [ngValue]="TypeMouvementStock.Sortie">
+                Sortie
+              </option>
+            </select>
+          </div>
+
+          <!-- FOURNISSEUR : OBLIGATOIRE POUR UNE ENTRÉE -->
+          <div
+            class="champ"
+            *ngIf="nouveauMouvement.typeMouvement === TypeMouvementStock.Entree">
+
+            <label for="fournisseurId">Fournisseur *</label>
+
+            <select
+              id="fournisseurId"
+              name="fournisseurId"
+              [(ngModel)]="nouveauMouvement.fournisseurId"
+              required>
+              <option [ngValue]="null" disabled>
+                Choisir un fournisseur
+              </option>
+
+              <option
+                *ngFor="let fournisseur of fournisseurs"
+                [ngValue]="fournisseur.id">
+                {{ fournisseur.nom }} {{ fournisseur.prenom }}
+                — {{ fournisseur.activite }}
+              </option>
+            </select>
+
+            <p *ngIf="fournisseurs.length === 0" class="info">
+              Aucun fournisseur disponible. Ajoutez d'abord un fournisseur.
+            </p>
+          </div>
+
+          <!-- QUANTITÉ -->
+          <div class="champ">
+            <label for="quantite">Quantité *</label>
+
+            <input
+              id="quantite"
+              name="quantite"
+              type="number"
+              min="1"
+              step="1"
+              [(ngModel)]="nouveauMouvement.quantite"
+              required>
+          </div>
+
+          <!-- MOTIF -->
+          <div class="champ">
+            <label for="motif">Motif</label>
+
+            <textarea
+              id="motif"
+              name="motif"
+              [(ngModel)]="nouveauMouvement.motif"
+              maxlength="250"
+              rows="2"
+              placeholder="Ex. Réapprovisionnement, consommation service X...">
+            </textarea>
+          </div>
+
         </div>
 
-        <div class="champ">
-          <label for="typeMouvement">Type de mouvement *</label>
-          <select
-            id="typeMouvement"
-            name="typeMouvement"
-            [(ngModel)]="nouveauMouvement.typeMouvement"
-            required>
-            <option [ngValue]="TypeMouvementStock.Entree">Entrée</option>
-            <option [ngValue]="TypeMouvementStock.Sortie">Sortie</option>
-          </select>
-        </div>
+        <button type="submit" [disabled]="enregistrement">
+          {{
+            enregistrement
+              ? 'Enregistrement...'
+              : 'Enregistrer le mouvement'
+          }}
+        </button>
+      </form>
 
-        <div class="champ">
-          <label for="quantite">Quantité *</label>
-          <input
-            id="quantite"
-            name="quantite"
-            type="number"
-            min="1"
-            step="1"
-            [(ngModel)]="nouveauMouvement.quantite"
-            required>
-        </div>
+      <p *ngIf="message" class="succes">{{ message }}</p>
+      <p *ngIf="erreur" class="erreur">{{ erreur }}</p>
+    </div>
+  </div>
 
-        <div class="champ">
-          <label for="motif">Motif</label>
-          <textarea
-            id="motif"
-            name="motif"
-            [(ngModel)]="nouveauMouvement.motif"
-            maxlength="250"
-            rows="2"
-            placeholder="Ex. Réapprovisionnement, consommation service X..."></textarea>
-        </div>
+  <!-- PAGE : HISTORIQUE DES MOUVEMENTS -->
+  <div *ngIf="mode === 'historique'">
+
+    <h2>Historique des mouvements de stock</h2>
+
+    <p *ngIf="chargement">
+      Chargement des mouvements...
+    </p>
+
+    <p *ngIf="erreur" class="erreur">
+      {{ erreur }}
+    </p>
+
+    <p *ngIf="message" class="succes">
+      {{ message }}
+    </p>
+
+    <!-- BARRE DE RECHERCHE -->
+    <div class="barre-filtres" *ngIf="!chargement">
+
+      <input
+        type="text"
+        placeholder="🔍 Rechercher (article, référence, fournisseur, type, motif...)"
+        [(ngModel)]="recherche"
+        (ngModelChange)="surChangementFiltre()"
+        name="rechercheMouvements"
+        class="champ-recherche">
+
+      <button
+        type="button"
+        (click)="reinitialiserFiltres()">
+        Réinitialiser
+      </button>
+
+    </div>
+
+    <h3>Liste des mouvements</h3>
+
+    <div
+      class="table-container"
+      *ngIf="!chargement && mouvementsFiltres.length > 0">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Article</th>
+            <th>Type</th>
+            <th>Quantité</th>
+            <th>Fournisseur</th>
+            <th>Motif</th>
+            <th *ngIf="authService.estAdmin()" class="colonne-actions">
+              Actions
+            </th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr *ngFor="let mouvement of mouvementsAffiches">
+
+            <td>
+              {{ mouvement.dateMouvement | date:'dd/MM/yyyy HH:mm' }}
+            </td>
+
+            <td>
+              {{ mouvement.article?.nom || mouvement.articleId }}
+            </td>
+
+            <td
+              [ngClass]="mouvement.typeMouvement === TypeMouvementStock.Entree
+                ? 'type-entree'
+                : 'type-sortie'">
+              {{ libelleType(mouvement.typeMouvement) }}
+            </td>
+
+            <td>{{ mouvement.quantite }}</td>
+
+            <td>
+              <ng-container *ngIf="mouvement.typeMouvement === TypeMouvementStock.Entree">
+                <ng-container *ngIf="mouvement.fournisseur; else fournisseurIndisponible">
+                  {{ mouvement.fournisseur.nom }}
+                  {{ mouvement.fournisseur.prenom }}
+                </ng-container>
+
+                <ng-template #fournisseurIndisponible>
+                  —
+                </ng-template>
+              </ng-container>
+
+              <ng-container *ngIf="mouvement.typeMouvement === TypeMouvementStock.Sortie">
+                —
+              </ng-container>
+            </td>
+
+            <td>{{ mouvement.motif || '—' }}</td>
+
+            <td *ngIf="authService.estAdmin()" class="colonne-actions">
+              <button
+                type="button"
+                (click)="supprimerMouvement(mouvement)"
+                class="bouton-supprimer">
+                Supprimer
+              </button>
+            </td>
+
+          </tr>
+        </tbody>
+      </table>
+
+    </div>
+
+    <!-- PAGINATION -->
+    <div
+      class="pagination"
+      *ngIf="!chargement && mouvementsFiltres.length > 0">
+
+      <span class="info-pagination">
+        {{ mouvementsFiltres.length }} résultat(s) —
+        page {{ pageActuelle }} / {{ totalPages }}
+      </span>
+
+      <div class="controles-pagination">
+
+        <button
+          type="button"
+          (click)="pagePrecedente()"
+          [disabled]="pageActuelle === 1">
+          ←
+        </button>
+
+        <button
+          type="button"
+          *ngFor="let page of pagesAffichables"
+          (click)="allerPage(page)"
+          [class.page-active]="page === pageActuelle">
+          {{ page }}
+        </button>
+
+        <button
+          type="button"
+          (click)="pageSuivante()"
+          [disabled]="pageActuelle === totalPages">
+          →
+        </button>
 
       </div>
 
-      <button type="submit" [disabled]="enregistrement">
-        {{ enregistrement ? 'Enregistrement...' : 'Enregistrer le mouvement' }}
-      </button>
-    </form>
+      <select
+        [(ngModel)]="taillePage"
+        (ngModelChange)="surChangementFiltre()"
+        name="taillePageMouvements">
 
-    <p *ngIf="message" class="message-succes">{{ message }}</p>
-    <p *ngIf="erreur" class="message-erreur">{{ erreur }}</p>
+        <option
+          *ngFor="let taille of taillesPageDisponibles"
+          [ngValue]="taille">
+          {{ taille }} / page
+        </option>
+
+      </select>
+
+    </div>
+
+    <p *ngIf="!chargement && mouvementsFiltres.length === 0 && mouvements.length > 0">
+      Aucun résultat ne correspond à votre recherche.
+    </p>
+
+    <p *ngIf="!chargement && mouvements.length === 0">
+      Aucun mouvement enregistré.
+    </p>
+
   </div>
-
-  <h3>Historique des mouvements</h3>
-
-  <p *ngIf="chargement">Chargement des mouvements...</p>
-
-  <div class="table-container" *ngIf="!chargement && mouvements.length > 0">
-    <table>
-      <thead>
-        <tr>
-          <th>Date</th>
-          <th>Article</th>
-          <th>Type</th>
-          <th>Quantité</th>
-          <th>Motif</th>
-          <th *ngIf="authService.estAdmin()">Actions</th>
-        </tr>
-      </thead>
-
-      <tbody>
-        <tr *ngFor="let mouvement of mouvements">
-          <td>{{ mouvement.dateMouvement | date:'dd/MM/yyyy HH:mm' }}</td>
-          <td>{{ mouvement.article?.nom || mouvement.articleId }}</td>
-          <td [ngClass]="mouvement.typeMouvement === TypeMouvementStock.Entree ? 'type-entree' : 'type-sortie'">
-            {{ libelleType(mouvement.typeMouvement) }}
-          </td>
-          <td>{{ mouvement.quantite }}</td>
-          <td>{{ mouvement.motif || '—' }}</td>
-          <td *ngIf="authService.estAdmin()">
-            <button type="button" (click)="supprimerMouvement(mouvement)">Supprimer</button>
-          </td>
-          <!-- <td *ngIf="!authService.estAdmin()">—</td> -->
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <p *ngIf="!chargement && mouvements.length === 0">
-    Aucun mouvement enregistré.
-  </p>
 </div>

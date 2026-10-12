@@ -14,6 +14,9 @@ import { AdminUsersComponent } from './pages/admin-users/admin-users.component';
 import { authGuard } from './guards/auth.guard';
 import { adminGuard } from './guards/admin.guard';
 import { AdminJournalComponent } from './pages/admin-journal/admin-journal.component';
+import { ParametresComponent } from './pages/parametres/parametres.component';
+import { FournisseursComponent } from './pages/fournisseurs/fournisseurs.component';
+import { FournisseurFormComponent } from './pages/fournisseur-form/fournisseur-form.component';
 
 export const routes: Routes = [
   { path: 'connexion', component: LoginComponent },
@@ -21,7 +24,19 @@ export const routes: Routes = [
   { path: 'mot-de-passe-oublie', component: ForgotPasswordComponent },
   { path: 'reinitialiser-mot-de-passe', component: ResetPasswordComponent },
   { path: 'admin/journal', component: AdminJournalComponent, canActivate: [authGuard, adminGuard] },
+  { path: 'parametres', component: ParametresComponent, canActivate: [authGuard, adminGuard]},
 
+
+  {
+    path: 'fournisseurs',
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'liste', pathMatch: 'full' },
+      { path: 'liste', component: FournisseursComponent },
+      { path: 'nouveau', component: FournisseurFormComponent },
+      { path: 'modifier/:id', component: FournisseurFormComponent }
+    ]
+  },
 
   {
     path: 'articles',
@@ -48,9 +63,13 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: 'profil',
-    component: ProfileComponent,
-    canActivate: [authGuard]
+    path: 'mouvements-stock',
+    canActivate: [authGuard],
+    children: [
+      { path: '', redirectTo: 'historique', pathMatch: 'full' },
+      { path: 'nouveau', component: MouvementsStockComponent },
+      { path: 'historique', component: MouvementsStockComponent }
+    ]
   },
   {
     path: 'admin/utilisateurs',

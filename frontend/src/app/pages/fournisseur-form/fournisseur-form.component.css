@@ -1,0 +1,146 @@
+
+.fournisseur-form-page {
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.entete-page {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.entete-page h2 {
+  margin: 0 0 8px;
+}
+
+.entete-page p {
+  margin: 0;
+  color: #64748b;
+}
+
+.carte-formulaire {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+.grille-formulaire {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.champ-large {
+  grid-column: 1 / -1;
+}
+
+.champ label {
+  font-weight: 600;
+  color: #334155;
+}
+
+.champ input,
+.champ textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 11px 12px;
+  border: 1px solid #cbd5e1;
+  border-radius: 7px;
+  font: inherit;
+  background: #fff;
+}
+
+.champ input:focus,
+.champ textarea:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.champs-obligatoires {
+  color: #64748b;
+  font-size: 13px;
+  margin-top: 20px;
+}
+
+.actions-formulaire {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-top: 24px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+}
+
+.btn-retour,
+.btn-annuler,
+.btn-enregistrer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 16px;
+  border-radius: 7px;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-retour,
+.btn-annuler {
+  color: #334155;
+  background: #fff;
+  border: 1px solid #cbd5e1;
+}
+
+.btn-enregistrer {
+  color: #fff;
+  background: #2563eb;
+  border: 1px solid #2563eb;
+}
+
+.btn-enregistrer:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.message-erreur {
+  margin-bottom: 18px;
+  padding: 12px 14px;
+  color: #991b1b;
+  background: #fee2e2;
+  border-radius: 7px;
+}
+
+.info {
+  padding: 20px;
+  color: #475569;
+}
+
+@media (max-width: 650px) {
+  .grille-formulaire {
+    grid-template-columns: 1fr;
+  }
+
+  .champ-large {
+    grid-column: auto;
+  }
+
+  .carte-formulaire {
+    padding: 16px;
+  }
+}

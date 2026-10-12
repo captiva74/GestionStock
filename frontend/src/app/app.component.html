@@ -70,9 +70,80 @@
         </a>
       </div>
 
-      <a routerLink="/mouvements-stock" routerLinkActive="active">
-        <span class="nav-icon">⇄</span>
-        <span>Mouvements de stock</span>
+
+
+      <button
+        type="button"
+        class="menu-parent"
+        [class.active]="menuMouvementsActif"
+        (click)="basculerMenuMouvements()">
+        <span class="nav-left">
+          <span class="nav-icon">⇄</span>
+          <span>Mouvements de stock</span>
+        </span>
+        <span class="nav-chevron" [class.ouvert]="menuMouvementsOuvert">▾</span>
+      </button>
+
+      <div class="sous-menu" *ngIf="menuMouvementsOuvert">
+        <a
+          routerLink="/mouvements-stock/nouveau"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="sous-item">
+          <span class="nav-icon">➕</span>
+          <span>Ajouter un mouvement</span>
+        </a>
+
+        <a
+          routerLink="/mouvements-stock/historique"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="sous-item">
+          <span class="nav-icon">◷</span>
+          <span>Historique des mouvements</span>
+        </a>
+      </div>
+
+      <!-- FOURNISSEURS -->
+      <button
+        type="button"
+        class="menu-parent"
+        [class.active]="menuFournisseursActif"
+        (click)="basculerMenuFournisseurs()">
+        <span class="nav-left">
+          <span class="nav-icon">🏢</span>
+          <span>Fournisseurs</span>
+        </span>
+        <span class="nav-chevron" [class.ouvert]="menuFournisseursOuvert">▾</span>
+      </button>
+
+      <div class="sous-menu" *ngIf="menuFournisseursOuvert">
+        <a
+          routerLink="/fournisseurs/liste"
+          routerLinkActive="active"
+          class="sous-item">
+          <span class="nav-icon">📋</span>
+          <span>Liste des fournisseurs</span>
+        </a>
+
+        <a
+          routerLink="/fournisseurs/nouveau"
+          routerLinkActive="active"
+          class="sous-item">
+          <span class="nav-icon">➕</span>
+          <span>Ajouter un fournisseur</span>
+        </a>
+      </div>
+
+
+
+      <a
+        *ngIf="authService.estAdmin()"
+        routerLink="/parametres"
+        routerLinkActive="active"
+      >
+        <span class="nav-icon">⚙️</span>
+        <span>Paramètres d'alerte</span>
       </a>
 
       <a *ngIf="authService.estAdmin()" routerLink="/admin/journal" routerLinkActive="active">
@@ -97,6 +168,14 @@
       <div>
         <h1>Gestion du stock</h1>
         <p>Suivez et gérez votre matériel et vos fournitures.</p>
+      </div>
+
+      <div class="choix-agence" *ngIf="authService.estSuperAdmin()">
+        <label for="agence">Agence</label>
+        <select id="agence" [ngModel]="agenceChoisie" (ngModelChange)="changerAgence($event)">
+          <option [ngValue]="null">Mon agence</option>
+          <option *ngFor="let code of agences" [ngValue]="code">Agence {{ code - 200 }}</option>
+        </select>
       </div>
 
       <div class="menu-utilisateur">

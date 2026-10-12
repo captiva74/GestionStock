@@ -1,0 +1,192 @@
+<div class="fournisseurs-page page">
+
+  <!-- EN-TÊTE -->
+  <div class="entete-page">
+    <div>
+      <h2>Liste des fournisseurs</h2>
+      <p>Consultez et gérez les fournisseurs de votre stock.</p>
+    </div>
+
+    <a routerLink="/fournisseurs/nouveau" class="btn-ajouter">
+      ➕ Ajouter un fournisseur
+    </a>
+  </div>
+
+  <div class="carte-liste">
+
+    <!-- BARRE DE RECHERCHE -->
+    <div class="barre-filtres" *ngIf="!chargement">
+
+      <input
+        type="text"
+        placeholder="🔍 Rechercher par nom, prénom, activité, adresse, e-mail ou téléphone..."
+        [(ngModel)]="recherche"
+        (ngModelChange)="surChangementFiltre()"
+        name="rechercheFournisseurs"
+        class="champ-recherche"
+        aria-label="Rechercher un fournisseur">
+
+      <button
+        type="button"
+        (click)="reinitialiserFiltres()">
+        Réinitialiser
+      </button>
+
+      <span class="info-pagination">
+        {{ fournisseursFiltres.length }} fournisseur(s)
+      </span>
+
+      <select
+        [ngModel]="taillePage"
+        (ngModelChange)="changerTaillePage($event)"
+        name="taillePageFournisseurs"
+        aria-label="Nombre de fournisseurs par page">
+
+        <option
+          *ngFor="let taille of taillesPageDisponibles"
+          [ngValue]="taille">
+          {{ taille }} / page
+        </option>
+
+      </select>
+
+    </div>
+
+    <!-- MESSAGE D'ERREUR -->
+    <div *ngIf="erreur" class="message-erreur" role="alert">
+      {{ erreur }}
+    </div>
+
+    <!-- CHARGEMENT -->
+    <div *ngIf="chargement" class="etat-vide">
+      Chargement des fournisseurs...
+    </div>
+
+    <!-- TABLEAU DES FOURNISSEURS -->
+    <div *ngIf="!chargement" class="table-responsive">
+
+      <table>
+        <thead>
+          <tr>
+            <th>Nom</th>
+            <th>Prénom</th>
+            <th>Activité</th>
+            <th>Adresse</th>
+            <th>E-mail</th>
+            <th>Téléphone</th>
+            <th class="colonne-actions">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+
+          <tr *ngFor="let fournisseur of fournisseursAffiches">
+
+            <td>{{ fournisseur.nom }}</td>
+            <td>{{ fournisseur.prenom }}</td>
+            <td>{{ fournisseur.activite }}</td>
+            <td>{{ fournisseur.adresse || '—' }}</td>
+            <td>{{ fournisseur.email || '—' }}</td>
+            <td>{{ fournisseur.numTelephone || '—' }}</td>
+
+            <td class="actions">
+
+              <a
+                [routerLink]="['/fournisseurs/modifier', fournisseur.id]"
+                class="btn-modifier"
+                [attr.aria-label]="'Modifier ' + fournisseur.nom">
+                ✏️ 
+              </a>
+
+              <button
+                type="button"
+                class="btn-supprimer"
+                (click)="supprimerFournisseur(fournisseur)"
+                [attr.aria-label]="'Supprimer ' + fournisseur.nom">
+                🗑️ 
+              </button>
+
+            </td>
+
+          </tr>
+
+          <!-- AUCUN RÉSULTAT -->
+          <tr *ngIf="fournisseursAffiches.length === 0">
+
+            <td colspan="7" class="aucun-resultat">
+              {{
+                recherche
+                  ? 'Aucun fournisseur ne correspond à votre recherche.'
+                  : 'Aucun fournisseur enregistré.'
+              }}
+            </td>
+
+          </tr>
+
+        </tbody>
+      </table>
+
+    </div>
+
+    <!-- PAGINATION -->
+    <div
+      class="pagination"
+      *ngIf="!chargement && fournisseursFiltres.length > 0">
+
+      <span class="info-pagination">
+        Affichage de {{ premierResultat }} à {{ dernierResultat }}
+        sur {{ fournisseursFiltres.length }} fournisseur(s) —
+        page {{ pageActuelle }} / {{ totalPages }}
+      </span>
+
+      <div class="controles-pagination">
+
+        <!-- PAGE PRÉCÉDENTE -->
+        <button
+          type="button"
+          (click)="pagePrecedente()"
+          [disabled]="pageActuelle === 1"
+          aria-label="Page précédente">
+          ←
+        </button>
+
+        <!-- NUMÉROS DE PAGE -->
+        <button
+          type="button"
+          *ngFor="let page of pagesAffichables"
+          (click)="allerPage(page)"
+          [class.page-active]="page === pageActuelle"
+          [attr.aria-current]="page === pageActuelle ? 'page' : null">
+          {{ page }}
+        </button>
+
+        <!-- PAGE SUIVANTE -->
+        <button
+          type="button"
+          (click)="pageSuivante()"
+          [disabled]="pageActuelle === totalPages"
+          aria-label="Page suivante">
+          →
+        </button>
+
+      </div>
+
+      <!-- NOMBRE DE LIGNES PAR PAGE -->
+      <select
+        [ngModel]="taillePage"
+        (ngModelChange)="changerTaillePage($event)"
+        name="taillePagePagination"
+        aria-label="Nombre de fournisseurs par page">
+
+        <option
+          *ngFor="let taille of taillesPageDisponibles"
+          [ngValue]="taille">
+          {{ taille }} / page
+        </option>
+
+      </select>
+
+    </div>
+
+  </div>
+</div>

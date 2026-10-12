@@ -1,0 +1,50 @@
+<main class="parametres-page">
+  <h2>Paramètres d'alerte de stock</h2>
+
+  <p class="description">
+    Configurez l'adresse e-mail qui recevra les alertes lorsque le stock d'un
+    article atteint ou passe sous son seuil minimum.
+  </p>
+
+  <div *ngIf="chargement" class="information">
+    Chargement des paramètres...
+  </div>
+
+  <form
+    *ngIf="!chargement"
+    class="parametres-form"
+    (ngSubmit)="enregistrer()"
+  >
+    <div class="champ">
+      <label for="emailAlerteStock">
+        Adresse e-mail de réception des alertes
+      </label>
+
+      <input
+        id="emailAlerteStock"
+        name="emailAlerteStock"
+        type="email"
+        [(ngModel)]="emailAlerteStock"
+        maxlength="200"
+        placeholder="exemple@domaine.com"
+        autocomplete="email"
+      />
+
+      <small>
+        Laissez le champ vide si vous souhaitez désactiver les alertes par e-mail.
+      </small>
+    </div>
+
+    <div *ngIf="message" class="message-succes" role="status">
+      {{ message }}
+    </div>
+
+    <div *ngIf="erreur" class="message-erreur" role="alert">
+      {{ erreur }}
+    </div>
+
+    <button type="submit" [disabled]="enregistrement">
+      {{ enregistrement ? 'Enregistrement...' : 'Enregistrer les paramètres' }}
+    </button>
+  </form>
+</main>

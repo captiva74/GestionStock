@@ -7,9 +7,18 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const token = authService.getToken();
 
   if (token) {
-    req = req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` }
-    });
+    const entetes: Record<string, string> = {
+      Authorization: `Bearer ${token}`
+    };
+
+    // Le siège peut consulter une autre agence (le serveur revérifie le rôle)
+    const agence = authService.getAgenceChoisie();
+    console.log('Agence envoyee :', agence);
+    if (agence !== null) {
+      entetes['X-Agence'] = String(agence);
+    }
+
+    req = req.clone({ setHeaders: entetes });
   }
 
   return next(req);

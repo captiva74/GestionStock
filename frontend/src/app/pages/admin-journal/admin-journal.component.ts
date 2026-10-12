@@ -1,3 +1,4 @@
+
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,6 +21,11 @@ export class AdminJournalComponent implements OnInit {
   dateDebut = '';
   dateFin = '';
 
+  // Pagination, identique à la page Catégories
+  pageActuelle = 1;
+  taillePage = 10;
+  taillesPageDisponibles = [10, 25, 50, 100];
+
   constructor(private journalService: JournalService) {}
 
   ngOnInit(): void {
@@ -29,6 +35,7 @@ export class AdminJournalComponent implements OnInit {
   charger(): void {
     this.chargement = true;
     this.erreur = '';
+    this.pageActuelle = 1;
 
     this.journalService
       .getJournal({
@@ -40,6 +47,7 @@ export class AdminJournalComponent implements OnInit {
       .subscribe({
         next: (donnees) => {
           this.entrees = donnees;
+          this.pageActuelle = 1;
           this.chargement = false;
         },
         error: (err) => {
@@ -50,11 +58,53 @@ export class AdminJournalComponent implements OnInit {
       });
   }
 
+  get totalPages(): number {
+    return Math.max(
+      1,
+      Math.ceil(this.entrees.length / this.taillePage)
+    );
+  }
+
+  get entreesAffichees(): JournalActivite[] {
+    const debut = (this.pageActuelle - 1) * this.taillePage;
+
+    return this.entrees.slice(debut, debut + this.taillePage);
+  }
+
+  get pagesAffichables(): number[] {
+    const pages: number[] = [];
+
+    for (let i = 1; i <= this.totalPages; i++) {
+      pages.push(i);
+    }
+
+    return pages;
+  }
+
+  surChangementFiltre(): void {
+    this.pageActuelle = 1;
+  }
+
+  allerPage(page: number): void {
+    if (page >= 1 && page <= this.totalPages) {
+      this.pageActuelle = page;
+    }
+  }
+
+  pagePrecedente(): void {
+    this.allerPage(this.pageActuelle - 1);
+  }
+
+  pageSuivante(): void {
+    this.allerPage(this.pageActuelle + 1);
+  }
+
   reinitialiser(): void {
     this.entiteFiltre = '';
     this.actionFiltre = '';
     this.dateDebut = '';
     this.dateFin = '';
+    this.pageActuelle = 1;
     this.charger();
   }
 }

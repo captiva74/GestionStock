@@ -1,3 +1,4 @@
+```html
 <div class="auth-page">
   <div class="auth-carte">
     <h2>Créer un compte</h2>
@@ -6,35 +7,112 @@
       <p>{{ succes }}</p>
     </div>
 
-    <form *ngIf="!succes" (ngSubmit)="sInscrire()">
+    <form *ngIf="!succes" #formInscription="ngForm" (ngSubmit)="sInscrire()">
+
       <div class="champ">
         <label for="nomComplet">Nom complet</label>
-        <input id="nomComplet" name="nomComplet" type="text" [(ngModel)]="nomComplet" required placeholder="Votre nom">
+        <input
+          id="nomComplet"
+          name="nomComplet"
+          type="text"
+          [(ngModel)]="nomComplet"
+          #nomCompletCtrl="ngModel"
+          required
+          maxlength="150"
+          placeholder="Votre nom">
+
+        <small class="message-erreur"
+          *ngIf="nomCompletCtrl.invalid && nomCompletCtrl.touched">
+          Le nom complet est obligatoire (150 caractères maximum).
+        </small>
       </div>
 
       <div class="champ">
         <label for="email">Email</label>
-        <input id="email" name="email" type="email" [(ngModel)]="email" required placeholder="vous@exemple.com">
+        <input
+          id="email"
+          name="email"
+          type="email"
+          [(ngModel)]="email"
+          #emailCtrl="ngModel"
+          required
+          email
+          maxlength="200"
+          placeholder="vous@exemple.com">
+
+        <small class="message-erreur"
+          *ngIf="emailCtrl.invalid && emailCtrl.touched">
+          Saisissez une adresse e-mail valide.
+        </small>
       </div>
 
       <div class="champ">
         <label for="motDePasse">Mot de passe</label>
-        <input id="motDePasse" name="motDePasse" type="password" [(ngModel)]="motDePasse" required minlength="6">
+        <input
+          id="motDePasse"
+          name="motDePasse"
+          type="password"
+          [(ngModel)]="motDePasse"
+          #motDePasseCtrl="ngModel"
+          required
+          minlength="12"
+          maxlength="72"
+          autocomplete="new-password"
+          placeholder="12 caractères minimum">
+
+        <small class="message-erreur"
+          *ngIf="motDePasseCtrl.touched && motDePasseCtrl.errors?.['required']">
+          Le mot de passe est obligatoire.
+        </small>
+
+        <small class="message-erreur"
+          *ngIf="motDePasseCtrl.touched && motDePasseCtrl.errors?.['minlength']">
+          Le mot de passe doit contenir au moins 12 caractères.
+        </small>
+
+        <small class="message-erreur"
+          *ngIf="motDePasseCtrl.touched && motDePasseCtrl.errors?.['maxlength']">
+          Le mot de passe ne doit pas dépasser 72 caractères.
+        </small>
       </div>
 
       <div class="champ">
         <label for="numeroAgence">Numéro d'agence (1 à 69)</label>
-        <input id="numeroAgence" name="numeroAgence" type="number" min="1" max="69" [(ngModel)]="numeroAgence" required placeholder="Ex : 44">
+        <input
+          id="numeroAgence"
+          name="numeroAgence"
+          type="number"
+          min="1"
+          max="69"
+          [(ngModel)]="numeroAgence"
+          #numeroAgenceCtrl="ngModel"
+          required
+          placeholder="Ex : 44">
+
+        <small class="message-erreur"
+          *ngIf="numeroAgenceCtrl.touched && numeroAgenceCtrl.invalid">
+          Choisissez un numéro d'agence entre 1 et 69.
+        </small>
       </div>
 
       <div class="champ">
         <label for="codeInscription">Code d'inscription de l'agence</label>
-        <input id="codeInscription" name="codeInscription" type="text" [(ngModel)]="codeInscription" required placeholder="Fourni par votre administrateur">
+        <input
+          id="codeInscription"
+          name="codeInscription"
+          type="text"
+          [(ngModel)]="codeInscription"
+          required
+          maxlength="50"
+          placeholder="Fourni par votre administrateur">
       </div>
 
-      <button type="submit" [disabled]="enregistrement">
+      <button
+        type="submit"
+        [disabled]="enregistrement || formInscription.invalid">
         {{ enregistrement ? 'Création...' : 'Créer le compte' }}
       </button>
+
     </form>
 
     <p *ngIf="erreur" class="message-erreur">{{ erreur }}</p>
@@ -44,3 +122,4 @@
     </div>
   </div>
 </div>
+```

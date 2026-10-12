@@ -1,0 +1,85 @@
+.parametres-page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 24px;
+}
+
+.parametres-page h2 {
+  margin-bottom: 12px;
+}
+
+.description {
+  color: #555;
+  line-height: 1.6;
+  margin-bottom: 24px;
+}
+
+.parametres-form {
+  padding: 24px;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+}
+
+.champ {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 20px;
+}
+
+.champ label {
+  font-weight: 600;
+}
+
+.champ input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #bbb;
+  border-radius: 5px;
+  font-size: 15px;
+}
+
+.champ small {
+  color: #666;
+  line-height: 1.5;
+}
+
+.parametres-form button {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 5px;
+  background: #2563eb;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.parametres-form button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.message-succes,
+.message-erreur,
+.information {
+  padding: 12px;
+  margin-bottom: 16px;
+  border-radius: 5px;
+}
+
+.message-succes {
+  color: #166534;
+  background: #dcfce7;
+}
+
+.message-erreur {
+  color: #991b1b;
+  background: #fee2e2;
+}
+
+.information {
+  background: #f3f4f6;
+  color: #374151;
+}

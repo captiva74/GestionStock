@@ -37,22 +37,40 @@ public class MouvementsStockController : ControllerBase
         var mouvements = await _context.MouvementsStock
             .AsNoTracking()
             .Include(m => m.Article)
+            .Include(m => m.Fournisseur)
             .OrderByDescending(m => m.DateMouvement)
             .ToListAsync();
+
+        // Éviter une boucle de sérialisation avec la navigation inverse.
+        foreach (var mouvement in mouvements)
+        {
+            if (mouvement.Fournisseur is not null)
+                mouvement.Fournisseur.MouvementsStock =
+                    new List<MouvementStock>();
+        }
 
         return Ok(mouvements);
     }
 
     // GET : api/mouvementsstock/article/5
     [HttpGet("article/{articleId:int}")]
-    public async Task<ActionResult<IEnumerable<MouvementStock>>> GetMouvementsArticle(
-        int articleId)
+    public async Task<ActionResult<IEnumerable<MouvementStock>>>
+        GetMouvementsArticle(int articleId)
     {
         var mouvements = await _context.MouvementsStock
             .AsNoTracking()
             .Where(m => m.ArticleId == articleId)
+            .Include(m => m.Article)
+            .Include(m => m.Fournisseur)
             .OrderByDescending(m => m.DateMouvement)
             .ToListAsync();
+
+        foreach (var mouvement in mouvements)
+        {
+            if (mouvement.Fournisseur is not null)
+                mouvement.Fournisseur.MouvementsStock =
+                    new List<MouvementStock>();
+        }
 
         return Ok(mouvements);
     }
@@ -63,7 +81,14 @@ public class MouvementsStockController : ControllerBase
         MouvementStock mouvement)
     {
         if (mouvement.Quantite <= 0)
-            return BadRequest("La quantité doit être supérieure à zéro.");
+            return BadRequest(
+                "La quantité doit être supérieure à zéro.");
+
+        if (mouvement.TypeMouvement != TypeMouvementStock.Entree &&
+            mouvement.TypeMouvement != TypeMouvementStock.Sortie)
+        {
+            return BadRequest("Type de mouvement invalide.");
+        }
 
         var article = await _context.Articles
             .FirstOrDefaultAsync(a => a.Id == mouvement.ArticleId);
@@ -72,13 +97,31 @@ public class MouvementsStockController : ControllerBase
             return NotFound("Article introuvable.");
 
         if (article.TypeGestion != TypeGestionArticle.Fourniture)
+        {
             return BadRequest(
                 "Les mouvements de stock sont réservés aux fournitures.");
+        }
 
-        if (mouvement.TypeMouvement != TypeMouvementStock.Entree &&
-            mouvement.TypeMouvement != TypeMouvementStock.Sortie)
+        // Une entrée exige un fournisseur existant.
+        if (mouvement.TypeMouvement == TypeMouvementStock.Entree)
         {
-            return BadRequest("Type de mouvement invalide.");
+            if (!mouvement.FournisseurId.HasValue ||
+                mouvement.FournisseurId.Value <= 0)
+            {
+                return BadRequest(
+                    "Veuillez sélectionner un fournisseur pour une entrée de stock.");
+            }
+
+            var fournisseurExiste = await _context.Fournisseurs
+                .AnyAsync(f => f.Id == mouvement.FournisseurId.Value);
+
+            if (!fournisseurExiste)
+                return BadRequest("Le fournisseur sélectionné est introuvable.");
+        }
+        else
+        {
+            // Une sortie n'est pas associée à un fournisseur.
+            mouvement.FournisseurId = null;
         }
 
         if (mouvement.TypeMouvement == TypeMouvementStock.Sortie &&
@@ -88,26 +131,34 @@ public class MouvementsStockController : ControllerBase
                 $"Stock insuffisant. Quantité disponible : {article.QuantiteStock}.");
         }
 
+        if (mouvement.TypeMouvement == TypeMouvementStock.Entree &&
+            article.QuantiteStock > int.MaxValue - mouvement.Quantite)
+        {
+            return BadRequest(
+                "La quantité dépasse la limite autorisée.");
+        }
+
         var franchitLeSeuil = false;
 
         if (mouvement.TypeMouvement == TypeMouvementStock.Entree)
         {
-            if (article.QuantiteStock > int.MaxValue - mouvement.Quantite)
-                return BadRequest("La quantité dépasse la limite autorisée.");
-
             article.QuantiteStock += mouvement.Quantite;
         }
         else
         {
-            var etaitAuDessusDuSeuil = article.QuantiteStock > article.SeuilMinimum;
+            var etaitAuDessusDuSeuil =
+                article.QuantiteStock > article.SeuilMinimum;
 
             article.QuantiteStock -= mouvement.Quantite;
 
-            franchitLeSeuil = etaitAuDessusDuSeuil && article.QuantiteStock <= article.SeuilMinimum;
+            franchitLeSeuil =
+                etaitAuDessusDuSeuil &&
+                article.QuantiteStock <= article.SeuilMinimum;
         }
 
         mouvement.Id = 0;
         mouvement.Article = null;
+        mouvement.Fournisseur = null;
         mouvement.DateMouvement = DateTime.Now;
 
         _context.MouvementsStock.Add(mouvement);
@@ -115,14 +166,34 @@ public class MouvementsStockController : ControllerBase
         await _context.SaveChangesAsync();
 
         var (userId, userNom) = GetUtilisateurCourant();
+
+        var details = $"{mouvement.TypeMouvement} de " +
+                      $"{mouvement.Quantite} sur {article.Nom}";
+
+        if (mouvement.FournisseurId.HasValue)
+        {
+            var fournisseur = await _context.Fournisseurs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    f => f.Id == mouvement.FournisseurId.Value);
+
+            if (fournisseur is not null)
+            {
+                details += $" - Fournisseur : {fournisseur.Nom} " +
+                           $"{fournisseur.Prenom}";
+            }
+        }
+
         await _journalService.EnregistrerAsync(
-            userId, userNom, "Création", "Mouvement de stock", mouvement.Id,
-            $"{mouvement.TypeMouvement} de {mouvement.Quantite} sur {article.Nom}");
+            userId,
+            userNom,
+            "Création",
+            "Mouvement de stock",
+            mouvement.Id,
+            details);
 
         if (franchitLeSeuil)
-        {
             await EnvoyerAlerteStockBasAsync(article);
-        }
 
         return CreatedAtAction(
             nameof(GetMouvementsArticle),
@@ -149,15 +220,22 @@ public class MouvementsStockController : ControllerBase
             if (mouvement.TypeMouvement == TypeMouvementStock.Entree)
             {
                 if (mouvement.Quantite > article.QuantiteStock)
+                {
                     return BadRequest(
-                        "Impossible de supprimer : le stock actuel est inférieur à la quantité de ce mouvement.");
+                        "Impossible de supprimer : le stock actuel est " +
+                        "inférieur à la quantité de ce mouvement.");
+                }
 
                 article.QuantiteStock -= mouvement.Quantite;
             }
             else
             {
-                if (article.QuantiteStock > int.MaxValue - mouvement.Quantite)
-                    return BadRequest("La quantité dépasse la limite autorisée.");
+                if (article.QuantiteStock >
+                    int.MaxValue - mouvement.Quantite)
+                {
+                    return BadRequest(
+                        "La quantité dépasse la limite autorisée.");
+                }
 
                 article.QuantiteStock += mouvement.Quantite;
             }
@@ -167,59 +245,86 @@ public class MouvementsStockController : ControllerBase
             ? $"{mouvement.TypeMouvement} de {mouvement.Quantite} sur {article.Nom}"
             : $"{mouvement.TypeMouvement} de {mouvement.Quantite}";
 
+        if (mouvement.FournisseurId.HasValue)
+        {
+            var fournisseur = await _context.Fournisseurs
+                .AsNoTracking()
+                .FirstOrDefaultAsync(
+                    f => f.Id == mouvement.FournisseurId.Value);
+
+            if (fournisseur is not null)
+            {
+                detailsSuppression +=
+                    $" - Fournisseur : {fournisseur.Nom} {fournisseur.Prenom}";
+            }
+        }
+
         _context.MouvementsStock.Remove(mouvement);
 
         await _context.SaveChangesAsync();
 
         var (userId, userNom) = GetUtilisateurCourant();
+
         await _journalService.EnregistrerAsync(
-            userId, userNom, "Suppression", "Mouvement de stock", id, detailsSuppression);
+            userId,
+            userNom,
+            "Suppression",
+            "Mouvement de stock",
+            id,
+            detailsSuppression);
 
         return NoContent();
     }
 
     private async Task EnvoyerAlerteStockBasAsync(Article article)
     {
-        // L'alerte ne part qu'aux admins de l'agence de l'utilisateur connecté
-        if (!int.TryParse(User.FindFirstValue("code_structure"), out var codeAgence))
-            return;
+        Console.WriteLine(
+            $"[ALERTE STOCK] Appel pour l'article {article.Id} - " +
+            $"{article.Nom} - Stock={article.QuantiteStock} - " +
+            $"Seuil={article.SeuilMinimum} - " +
+            $"Heure={DateTime.Now:HH:mm:ss.fff}");
 
-        var emailsAdmins = await _central.Utilisateurs
-            .Where(u => u.CodeStructure == codeAgence
-                        && u.EstActif
-                        && (u.Role == RoleUtilisateur.AdminAgence || u.Role == RoleUtilisateur.Admin))
-            .Select(u => u.Email)
-            .ToListAsync();
+        // Lire l'adresse configurée dans la base de l'agence courante.
+        var parametres = await _context.ParametresApplication
+            .AsNoTracking()
+            .FirstOrDefaultAsync();
 
-        if (emailsAdmins.Count == 0)
+        var email = parametres?.EmailAlerteStock?.Trim();
+
+        // Aucune adresse configurée : ne pas envoyer d'e-mail.
+        if (string.IsNullOrWhiteSpace(email))
             return;
 
         var corps = $@"
             <p>Alerte stock bas sur GestionStock :</p>
             <ul>
-                <li><strong>Article :</strong> {article.Nom} ({article.Reference})</li>
+                <li><strong>Article :</strong> {System.Net.WebUtility.HtmlEncode(article.Nom)} ({System.Net.WebUtility.HtmlEncode(article.Reference ?? "Sans référence")})</li>
                 <li><strong>Stock actuel :</strong> {article.QuantiteStock}</li>
                 <li><strong>Seuil minimum :</strong> {article.SeuilMinimum}</li>
             </ul>
             <p>Pensez à réapprovisionner cet article.</p>";
 
-        foreach (var email in emailsAdmins)
+        try
         {
-            try
-            {
-                await _emailService.EnvoyerEmailAsync(email, $"⚠️ Stock bas : {article.Nom}", corps);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Échec d'envoi d'alerte stock à {email} : {ex.Message}");
-            }
+            await _emailService.EnvoyerEmailAsync(
+                email,
+                $"Alerte stock bas : {article.Nom}",
+                corps);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Échec d'envoi de l'alerte stock à {email} : {ex.Message}");
         }
     }
 
     private (int id, string nom) GetUtilisateurCourant()
     {
-        var id = int.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+        var id = int.Parse(
+            User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         var nom = User.FindFirstValue("nomComplet") ?? "Inconnu";
+
         return (id, nom);
     }
 }

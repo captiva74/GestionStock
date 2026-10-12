@@ -1,5 +1,5 @@
+
 using System.ComponentModel.DataAnnotations;
-using Microsoft.EntityFrameworkCore;
 
 namespace GestionStock.Api.Models;
 
@@ -26,4 +26,9 @@ public class MouvementStock
 
     [MaxLength(250)]
     public string? Motif { get; set; }
+
+    // Fournisseur facultatif pour préserver les mouvements existants.
+    public int? FournisseurId { get; set; }
+
+    public Fournisseur? Fournisseur { get; set; }
 }

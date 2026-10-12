@@ -134,6 +134,46 @@ namespace GestionStock.Api.Migrations
                     b.ToTable("Categories");
                 });
 
+            modelBuilder.Entity("GestionStock.Api.Models.Fournisseur", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Activite")
+                        .IsRequired()
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<string>("Adresse")
+                        .HasMaxLength(300)
+                        .HasColumnType("nvarchar(300)");
+
+                    b.Property<string>("Email")
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
+
+                    b.Property<string>("Nom")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("NumTelephone")
+                        .HasMaxLength(30)
+                        .HasColumnType("nvarchar(30)");
+
+                    b.Property<string>("Prenom")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Fournisseurs");
+                });
+
             modelBuilder.Entity("GestionStock.Api.Models.JournalActivite", b =>
                 {
                     b.Property<int>("Id")
@@ -189,6 +229,9 @@ namespace GestionStock.Api.Migrations
                     b.Property<DateTime>("DateMouvement")
                         .HasColumnType("datetime2");
 
+                    b.Property<int?>("FournisseurId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Motif")
                         .HasMaxLength(250)
                         .HasColumnType("nvarchar(250)");
@@ -203,7 +246,26 @@ namespace GestionStock.Api.Migrations
 
                     b.HasIndex("ArticleId");
 
+                    b.HasIndex("FournisseurId");
+
                     b.ToTable("MouvementsStock");
+                });
+
+            modelBuilder.Entity("GestionStock.Api.Models.ParametresApplication", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("EmailAlerteStock")
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ParametresApplication");
                 });
 
             modelBuilder.Entity("GestionStock.Api.Models.Utilisateur", b =>
@@ -213,6 +275,9 @@ namespace GestionStock.Api.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CodeStructure")
+                        .HasColumnType("int");
 
                     b.Property<DateTime>("DateCreation")
                         .HasColumnType("datetime2");
@@ -226,6 +291,10 @@ namespace GestionStock.Api.Migrations
                         .HasColumnType("bit");
 
                     b.Property<string>("MotDePasseHash")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("NomBase")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
@@ -270,7 +339,19 @@ namespace GestionStock.Api.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("GestionStock.Api.Models.Fournisseur", "Fournisseur")
+                        .WithMany("MouvementsStock")
+                        .HasForeignKey("FournisseurId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
                     b.Navigation("Article");
+
+                    b.Navigation("Fournisseur");
+                });
+
+            modelBuilder.Entity("GestionStock.Api.Models.Fournisseur", b =>
+                {
+                    b.Navigation("MouvementsStock");
                 });
 #pragma warning restore 612, 618
         }

@@ -1,7 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Article, ArticleService, TypeGestionArticle } from './article.service';
 
 export enum TypeMouvementStock {
   Entree = 0,
@@ -14,8 +13,17 @@ export interface MouvementStock {
   article?: {
     id: number;
     nom: string;
-    reference: string;
+    reference: string | null;
   } | null;
+
+  fournisseurId?: number | null;
+  fournisseur?: {
+    id: number;
+    nom: string;
+    prenom: string;
+    activite?: string;
+  } | null;
+
   typeMouvement: TypeMouvementStock;
   quantite: number;
   dateMouvement: string;
@@ -27,10 +35,11 @@ export interface NouveauMouvement {
   typeMouvement: TypeMouvementStock;
   quantite: number;
   motif?: string | null;
+  fournisseurId?: number | null;
 }
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
 export class MouvementStockService {
   private readonly apiUrl = 'http://localhost:5085/api/mouvementsstock';
@@ -41,11 +50,17 @@ export class MouvementStockService {
     return this.http.get<MouvementStock[]>(this.apiUrl);
   }
 
-  getMouvementsParArticle(articleId: number): Observable<MouvementStock[]> {
-    return this.http.get<MouvementStock[]>(`${this.apiUrl}/article/${articleId}`);
+  getMouvementsParArticle(
+    articleId: number
+  ): Observable<MouvementStock[]> {
+    return this.http.get<MouvementStock[]>(
+      `${this.apiUrl}/article/${articleId}`
+    );
   }
 
-  ajouterMouvement(mouvement: NouveauMouvement): Observable<MouvementStock> {
+  ajouterMouvement(
+    mouvement: NouveauMouvement
+  ): Observable<MouvementStock> {
     return this.http.post<MouvementStock>(this.apiUrl, mouvement);
   }
 

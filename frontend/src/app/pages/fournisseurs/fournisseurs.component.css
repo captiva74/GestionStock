@@ -1,0 +1,281 @@
+/* PAGE */
+.fournisseurs-page {
+  width: 100%;
+}
+
+.page {
+  max-width: 1000px;
+  margin: 30px auto;
+  padding: 24px;
+  font-family: Arial, sans-serif;
+  color: #263238;
+}
+
+/* EN-TÊTE */
+.entete-page {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 22px;
+}
+
+.entete-page h2 {
+  margin: 0 0 8px;
+  color: #1e3a5f;
+}
+
+.entete-page p {
+  margin: 0;
+  color: #64748b;
+}
+
+.btn-ajouter {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 11px 16px;
+  color: #fff;
+  background: #2563eb;
+  border-radius: 7px;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.btn-ajouter:hover {
+  background: #1d4ed8;
+}
+
+/* CARTE */
+.carte-liste {
+  width: 100%;
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+}
+
+/* BARRE DE FILTRES */
+.barre-filtres {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 18px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.champ-recherche {
+  flex: 1;
+  min-width: 220px;
+  padding: 10px 12px;
+  border: 1px solid #bdc7d1;
+  border-radius: 5px;
+  font-size: 14px;
+  font-family: inherit;
+}
+
+.champ-recherche:focus {
+  outline: none;
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.12);
+}
+
+.barre-filtres button,
+.controles-pagination button {
+  padding: 8px 12px;
+  color: white;
+  background: #1769aa;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.barre-filtres button:hover,
+.controles-pagination button:hover:not(:disabled) {
+  background: #0d4f86;
+}
+
+.barre-filtres select,
+.pagination select {
+  padding: 6px 10px;
+  color: #334155;
+  border: 1px solid #bdc7d1;
+  border-radius: 5px;
+  background: white;
+  font-family: inherit;
+}
+
+.info-pagination {
+  color: #64748b;
+  font-size: 13px;
+}
+
+/* TABLEAU */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+  background: white;
+}
+
+th,
+td {
+  padding: 13px 15px;
+  border-bottom: 1px solid #e2e8f0;
+  vertical-align: middle;
+}
+
+th {
+  color: white;
+  background: #1e3a5f;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+tbody tr:nth-child(even) {
+  background: #f5f7fa;
+}
+
+tbody tr:hover {
+  background: #eff6ff;
+}
+
+.colonne-actions {
+  min-width: 190px;
+}
+
+.actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  white-space: nowrap;
+}
+
+.btn-modifier,
+.btn-supprimer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 7px 9px;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 13px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.btn-modifier {
+  color: #1d4ed8;
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+}
+
+.btn-modifier:hover {
+  background: #dbeafe;
+}
+
+.btn-supprimer {
+  color: #b91c1c;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+}
+
+.btn-supprimer:hover {
+  background: #fee2e2;
+}
+
+/* ÉTATS VIDES */
+.aucun-resultat,
+.etat-vide {
+  padding: 28px;
+  text-align: center;
+  color: #64748b;
+}
+
+/* PAGINATION : MÊME STRUCTURE QUE MOUVEMENTS */
+.pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 18px;
+}
+
+.controles-pagination {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+}
+
+.controles-pagination button {
+  padding: 6px 12px;
+  font-size: 13px;
+}
+
+.controles-pagination button.page-active {
+  background: #0d4f86;
+  font-weight: bold;
+}
+
+.controles-pagination button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* MESSAGES */
+.message-erreur {
+  margin: 16px;
+  padding: 12px 14px;
+  color: #991b1b;
+  background: #fee2e2;
+  border-radius: 7px;
+}
+
+.succes {
+  color: #218838;
+  margin-top: 12px;
+}
+
+/* ADAPTATION AUX PETITS ÉCRANS */
+@media (max-width: 700px) {
+  .page {
+    margin: 10px auto;
+    padding: 12px;
+  }
+
+  .entete-page {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .barre-filtres {
+    align-items: stretch;
+  }
+
+  .champ-recherche {
+    min-width: 100%;
+  }
+
+  .pagination {
+    justify-content: flex-start;
+  }
+
+  .controles-pagination {
+    width: 100%;
+  }
+
+  .table-responsive table {
+    min-width: 850px;
+  }
+}

@@ -15,14 +15,32 @@ public class AgenceService : IAgenceService
         _accessor = accessor;
     }
 
-    // Lu dans le jeton signé : le client ne peut pas le modifier
     public int CodeStructure
     {
         get
         {
-            var valeur = _accessor.HttpContext?.User.FindFirst("code_structure")?.Value;
+            var http = _accessor.HttpContext;
+            var user = http?.User;
+            Console.WriteLine($"[Agence] Admin={user?.IsInRole("Admin")} ; X-Agence={http?.Request.Headers["X-Agence"].FirstOrDefault()}");
+
+            // Seul le siège (rôle Admin) peut consulter une autre agence
+            if (user is not null && user.IsInRole("Admin"))
+            {
+                var entete = http!.Request.Headers["X-Agence"].FirstOrDefault();
+                if (!string.IsNullOrWhiteSpace(entete))
+                {
+                    if (int.TryParse(entete, out var choisi) && choisi >= 201 && choisi <= 269)
+                        return choisi;
+
+                    throw new UnauthorizedAccessException("Agence demandée invalide.");
+                }
+            }
+
+            // Pour tous les autres : le code vient du jeton signé
+            var valeur = user?.FindFirst("code_structure")?.Value;
             if (!int.TryParse(valeur, out var code) || code < 201 || code > 269)
                 throw new UnauthorizedAccessException("Agence invalide ou absente du jeton.");
+
             return code;
         }
     }

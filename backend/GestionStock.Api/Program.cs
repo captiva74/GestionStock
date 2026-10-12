@@ -23,45 +23,77 @@ builder.Services.AddCors(options =>
     });
 });
 
-builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(
-        builder.Configuration.GetConnectionString("DefaultConnection")
-    )
-);
+// Accès au contexte HTTP pour identifier l'agence sélectionnée
+builder.Services.AddHttpContextAccessor();
+
+// Connexion centrale : utilisateurs, agences et alertes
+var connexionCentrale =
+    builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException(
+        "La connexion DefaultConnection est absente.");
 
 builder.Services.AddDbContext<CentralDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(connexionCentrale));
 
-// Services d'authentification et d'email
+// Modèle de connexion des bases agences
+var modeleConnexionAgences =
+    builder.Configuration.GetConnectionString("Agences")
+    ?? throw new InvalidOperationException(
+        "La connexion Agences est absente de appsettings.json.");
+
+// Service qui détermine l'agence à utiliser
+builder.Services.AddScoped<IAgenceService, AgenceService>();
+
+// Connexion dynamique : GestionStockDb01 à GestionStockDb69
+builder.Services.AddDbContext<ApplicationDbContext>((serviceProvider, options) =>
+{
+    var agenceService =
+        serviceProvider.GetRequiredService<IAgenceService>();
+
+    var connexionAgence = modeleConnexionAgences.Replace(
+        "{0}",
+        agenceService.NomBase,
+        StringComparison.Ordinal);
+
+    options.UseSqlServer(connexionAgence);
+});
+
+// Services existants
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
-
-// Services pour le journal 
 builder.Services.AddScoped<IJournalService, JournalService>();
 
 // Authentification JWT
-var cleJwt = builder.Configuration["Jwt:Cle"]!;
-var emetteurJwt = builder.Configuration["Jwt:Emetteur"]!;
+var cleJwt = builder.Configuration["Jwt:Cle"]
+    ?? throw new InvalidOperationException("Jwt:Cle est absent.");
+
+var emetteurJwt = builder.Configuration["Jwt:Emetteur"]
+    ?? throw new InvalidOperationException("Jwt:Emetteur est absent.");
 
 builder.Services
     .AddAuthentication(options =>
     {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultAuthenticateScheme =
+            JwtBearerDefaults.AuthenticationScheme;
+
+        options.DefaultChallengeScheme =
+            JwtBearerDefaults.AuthenticationScheme;
     })
     .AddJwtBearer(options =>
     {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidIssuer = emetteurJwt,
-            ValidateAudience = true,
-            ValidAudience = emetteurJwt,
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(cleJwt)),
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuer = true,
+                ValidIssuer = emetteurJwt,
+                ValidateAudience = true,
+                ValidAudience = emetteurJwt,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(
+                    Encoding.UTF8.GetBytes(cleJwt)),
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
     });
 
 builder.Services.AddAuthorization();
