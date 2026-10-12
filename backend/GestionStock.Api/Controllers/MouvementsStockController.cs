@@ -14,15 +14,18 @@ namespace GestionStock.Api.Controllers;
 public class MouvementsStockController : ControllerBase
 {
     private readonly ApplicationDbContext _context;
+    private readonly CentralDbContext _central;
     private readonly IEmailService _emailService;
     private readonly IJournalService _journalService;
 
     public MouvementsStockController(
         ApplicationDbContext context,
+        CentralDbContext central,
         IEmailService emailService,
         IJournalService journalService)
     {
         _context = context;
+        _central = central;
         _emailService = emailService;
         _journalService = journalService;
     }
@@ -128,7 +131,7 @@ public class MouvementsStockController : ControllerBase
     }
 
     // DELETE : api/mouvementsstock/5
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> SupprimerMouvement(int id)
     {
@@ -177,8 +180,14 @@ public class MouvementsStockController : ControllerBase
 
     private async Task EnvoyerAlerteStockBasAsync(Article article)
     {
-        var emailsAdmins = await _context.Utilisateurs
-            .Where(u => u.Role == RoleUtilisateur.Admin && u.EstActif)
+        // L'alerte ne part qu'aux admins de l'agence de l'utilisateur connecté
+        if (!int.TryParse(User.FindFirstValue("code_structure"), out var codeAgence))
+            return;
+
+        var emailsAdmins = await _central.Utilisateurs
+            .Where(u => u.CodeStructure == codeAgence
+                        && u.EstActif
+                        && (u.Role == RoleUtilisateur.AdminAgence || u.Role == RoleUtilisateur.Admin))
             .Select(u => u.Email)
             .ToListAsync();
 

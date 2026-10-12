@@ -13,6 +13,12 @@ public class RegisterDto
 
     [Required, MinLength(6)]
     public string MotDePasse { get; set; } = string.Empty;
+
+    [Range(201, 269)]
+    public int CodeStructure { get; set; }
+
+    [Required, MaxLength(50)]
+    public string CodeInscription { get; set; } = string.Empty;
 }
 
 public class LoginDto

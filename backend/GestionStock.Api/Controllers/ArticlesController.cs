@@ -49,7 +49,7 @@ public class ArticlesController : ControllerBase
     }
 
     // POST : api/articles
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpPost]
     public async Task<ActionResult<Article>> CreateArticle(Article article)
     {
@@ -113,7 +113,7 @@ public class ArticlesController : ControllerBase
     }
 
     // PUT : api/articles/5
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateArticle(int id, Article article)
     {
@@ -178,7 +178,7 @@ public class ArticlesController : ControllerBase
     }
 
     // PATCH : api/articles/5/desactiver
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpPatch("{id:int}/desactiver")]
     public async Task<IActionResult> DesactiverArticle(int id)
     {
@@ -195,7 +195,7 @@ public class ArticlesController : ControllerBase
     }
 
     // PATCH : api/articles/5/reformer
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpPatch("{id:int}/reformer")]
     public async Task<IActionResult> ReformerArticle(int id)
     {
@@ -213,7 +213,7 @@ public class ArticlesController : ControllerBase
     }
 
     // DELETE : api/articles/5
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteArticle(int id)
     {

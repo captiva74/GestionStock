@@ -13,13 +13,13 @@ namespace GestionStock.Api.Controllers;
 [Route("api/auth")]
 public class AuthController : ControllerBase
 {
-    private readonly ApplicationDbContext _context;
+    private readonly CentralDbContext _context;
     private readonly ITokenService _tokenService;
     private readonly IEmailService _emailService;
     private readonly IConfiguration _configuration;
 
     public AuthController(
-        ApplicationDbContext context,
+        CentralDbContext context,
         ITokenService tokenService,
         IEmailService emailService,
         IConfiguration configuration)
@@ -32,38 +32,40 @@ public class AuthController : ControllerBase
 
     // POST api/auth/register
     [HttpPost("register")]
-    public async Task<ActionResult<AuthResponseDto>> Register(RegisterDto dto)
+    public async Task<IActionResult> Register(RegisterDto dto)
     {
-        var emailExiste = await _context.Utilisateurs
-            .AnyAsync(u => u.Email == dto.Email);
+        var agence = await _context.Agences
+            .AsNoTracking()
+            .FirstOrDefaultAsync(a => a.CodeStructure == dto.CodeStructure && a.EstActive);
+
+        // Même message dans les deux cas : on ne révèle pas si l'agence existe
+        if (agence is null ||
+            !string.Equals(agence.CodeInscription, dto.CodeInscription.Trim(), StringComparison.OrdinalIgnoreCase))
+        {
+            return BadRequest("Agence ou code d'inscription incorrect.");
+        }
+
+        var email = dto.Email.Trim().ToLower();
+
+        var emailExiste = await _context.Utilisateurs.AnyAsync(u => u.Email == email);
 
         if (emailExiste)
             return BadRequest("Cette adresse email est déjà utilisée.");
 
-        var aucunUtilisateur = !await _context.Utilisateurs.AnyAsync();
-
         var utilisateur = new Utilisateur
         {
             NomComplet = dto.NomComplet.Trim(),
-            Email = dto.Email.Trim().ToLower(),
+            Email = email,
             MotDePasseHash = BCrypt.Net.BCrypt.HashPassword(dto.MotDePasse),
-            // Le tout premier compte créé devient automatiquement Admin
-            Role = aucunUtilisateur ? RoleUtilisateur.Admin : RoleUtilisateur.Utilisateur
+            Role = RoleUtilisateur.Utilisateur,   // jamais Admin à l'inscription
+            EstActif = false,                     // l'admin de l'agence doit l'activer
+            CodeStructure = agence.CodeStructure
         };
 
         _context.Utilisateurs.Add(utilisateur);
         await _context.SaveChangesAsync();
 
-        var token = _tokenService.GenererToken(utilisateur);
-
-        return Ok(new AuthResponseDto
-        {
-            Token = token,
-            Id = utilisateur.Id,
-            NomComplet = utilisateur.NomComplet,
-            Email = utilisateur.Email,
-            Role = utilisateur.Role.ToString()
-        });
+        return Ok(new { message = "Compte créé. Il sera utilisable après activation par l'administrateur de votre agence." });
     }
 
     // POST api/auth/login

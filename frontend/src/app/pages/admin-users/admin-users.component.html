@@ -18,10 +18,11 @@
         <input type="email" name="email" [(ngModel)]="edition.email" required>
       </div>
 
-      <div class="champ">
+      <div class="champ" *ngIf="estSuperAdmin">
         <label>Rôle</label>
         <select name="role" [(ngModel)]="edition.role">
-          <option [ngValue]="0">Admin</option>
+          <option [ngValue]="0">Admin (siège)</option>
+          <option [ngValue]="2">Admin d'agence</option>
           <option [ngValue]="1">Utilisateur</option>
         </select>
       </div>
@@ -59,15 +60,19 @@
         <td>{{ utilisateur.nomComplet }}</td>
         <td>{{ utilisateur.email }}</td>
         <td>{{ utilisateur.role }}</td>
-        <td>{{ utilisateur.estActif ? 'Actif' : 'Désactivé' }}</td>
+        <td>{{ utilisateur.estActif ? 'Actif' : 'Inactif' }}</td>
         <td>{{ utilisateur.dateCreation | date:'dd/MM/yyyy' }}</td>
         <td>
-          <button type="button" (click)="modifier(utilisateur)">Modifier</button>
-          <button type="button" (click)="supprimer(utilisateur)" style="margin-left: 6px; background: #c62828;">
-            Supprimer
-          </button>
+          <div class="actions" *ngIf="peutGerer(utilisateur); else aucuneAction">
+            <button *ngIf="!utilisateur.estActif" type="button" (click)="activer(utilisateur)">Activer</button>
+            <button type="button" (click)="modifier(utilisateur)">Modifier</button>
+            <button type="button" class="btn-danger" (click)="supprimer(utilisateur)">Supprimer</button>
+          </div>
+          <ng-template #aucuneAction>-</ng-template>
         </td>
       </tr>
     </tbody>
   </table>
+
+  <p *ngIf="!chargement && utilisateurs.length === 0">Aucun utilisateur.</p>
 </div>

@@ -43,10 +43,20 @@ export class AuthService {
       .pipe(tap((reponse) => this.enregistrerSession(reponse)));
   }
 
-  register(nomComplet: string, email: string, motDePasse: string): Observable<AuthResponse> {
-    return this.http
-      .post<AuthResponse>(`${this.apiUrl}/register`, { nomComplet, email, motDePasse })
-      .pipe(tap((reponse) => this.enregistrerSession(reponse)));
+  register(
+    nomComplet: string,
+    email: string,
+    motDePasse: string,
+    codeStructure: number,
+    codeInscription: string
+  ): Observable<{ message: string }> {
+    return this.http.post<{ message: string }>(`${this.apiUrl}/register`, {
+      nomComplet,
+      email,
+      motDePasse,
+      codeStructure,
+      codeInscription
+    });
   }
 
   motDePasseOublie(email: string): Observable<string> {
@@ -105,7 +115,14 @@ export class AuthService {
     return !!this.getToken();
   }
 
+  // Admin du siège ou admin d'agence : accès aux écrans d'administration
   estAdmin(): boolean {
+    const role = this.utilisateurCourantSubject.value?.role;
+    return role === 'Admin' || role === 'AdminAgence';
+  }
+
+  // Siège uniquement
+  estSuperAdmin(): boolean {
     return this.utilisateurCourantSubject.value?.role === 'Admin';
   }
 

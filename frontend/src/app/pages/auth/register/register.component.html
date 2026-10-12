@@ -2,7 +2,11 @@
   <div class="auth-carte">
     <h2>Créer un compte</h2>
 
-    <form (ngSubmit)="sInscrire()">
+    <div *ngIf="succes" class="message-succes">
+      <p>{{ succes }}</p>
+    </div>
+
+    <form *ngIf="!succes" (ngSubmit)="sInscrire()">
       <div class="champ">
         <label for="nomComplet">Nom complet</label>
         <input id="nomComplet" name="nomComplet" type="text" [(ngModel)]="nomComplet" required placeholder="Votre nom">
@@ -16,6 +20,16 @@
       <div class="champ">
         <label for="motDePasse">Mot de passe</label>
         <input id="motDePasse" name="motDePasse" type="password" [(ngModel)]="motDePasse" required minlength="6">
+      </div>
+
+      <div class="champ">
+        <label for="numeroAgence">Numéro d'agence (1 à 69)</label>
+        <input id="numeroAgence" name="numeroAgence" type="number" min="1" max="69" [(ngModel)]="numeroAgence" required placeholder="Ex : 44">
+      </div>
+
+      <div class="champ">
+        <label for="codeInscription">Code d'inscription de l'agence</label>
+        <input id="codeInscription" name="codeInscription" type="text" [(ngModel)]="codeInscription" required placeholder="Fourni par votre administrateur">
       </div>
 
       <button type="submit" [disabled]="enregistrement">

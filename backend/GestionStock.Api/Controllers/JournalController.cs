@@ -8,7 +8,7 @@ namespace GestionStock.Api.Controllers;
 
 [ApiController]
 [Route("api/journal")]
-[Authorize(Roles = "Admin")]
+[Authorize(Roles = "Admin,AdminAgence")]
 public class JournalController : ControllerBase
 {
     private readonly ApplicationDbContext _context;

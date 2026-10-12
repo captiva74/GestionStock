@@ -45,7 +45,7 @@ public class CategoriesController : ControllerBase
     }
 
     // POST: api/categories
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpPost]
     public async Task<ActionResult<Categorie>> CreateCategorie(
         Categorie categorie)
@@ -66,7 +66,7 @@ public class CategoriesController : ControllerBase
     }
 
     // PUT: api/categories/5
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpPut("{id:int}")]
     public async Task<IActionResult> UpdateCategorie(
         int id,
@@ -94,7 +94,7 @@ public class CategoriesController : ControllerBase
     }
 
     // PATCH: api/categories/5/desactiver
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpPatch("{id:int}/desactiver")]
     public async Task<IActionResult> DesactiverCategorie(int id)
     {
@@ -111,7 +111,7 @@ public class CategoriesController : ControllerBase
     }
 
     // DELETE: api/categories/5
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,AdminAgence")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteCategorie(int id)
     {

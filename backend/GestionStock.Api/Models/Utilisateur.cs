@@ -29,4 +29,8 @@ public class Utilisateur
     public string? TokenReinitialisation { get; set; }
 
     public DateTime? TokenReinitialisationExpiration { get; set; }
+
+    public int CodeStructure { get; set; }
+
+    public string NomBase { get; private set; } = default!;
 }

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Utilisateur } from '../../services/auth.service';
+import { AuthService, Utilisateur } from '../../services/auth.service';
 import { ModifierUtilisateurAdmin, UtilisateurService } from '../../services/utilisateur.service';
 
 @Component({
@@ -25,10 +25,35 @@ export class AdminUsersComponent implements OnInit {
     estActif: true
   };
 
-  constructor(private utilisateurService: UtilisateurService) {}
+  constructor(
+    private utilisateurService: UtilisateurService,
+    private authService: AuthService
+  ) {}
 
   ngOnInit(): void {
     this.chargerUtilisateurs();
+  }
+
+  get estSuperAdmin(): boolean {
+    return this.authService.estSuperAdmin();
+  }
+
+  // Admin = 0, Utilisateur = 1, AdminAgence = 2 (comme l'enum du serveur)
+  private roleVersNombre(role: string): number {
+    switch (role) {
+      case 'Admin': return 0;
+      case 'AdminAgence': return 2;
+      default: return 1;
+    }
+  }
+
+  // Un admin d'agence ne gère que les comptes simples
+  peutGerer(utilisateur: Utilisateur): boolean {
+    return this.estSuperAdmin || utilisateur.role === 'Utilisateur';
+  }
+
+  private messageErreur(err: any, defaut: string): string {
+    return typeof err?.error === 'string' && err.error ? err.error : defaut;
   }
 
   chargerUtilisateurs(): void {
@@ -47,12 +72,35 @@ export class AdminUsersComponent implements OnInit {
     });
   }
 
+  activer(utilisateur: Utilisateur): void {
+    this.erreur = '';
+    this.message = '';
+
+    const donnees: ModifierUtilisateurAdmin = {
+      nomComplet: utilisateur.nomComplet,
+      email: utilisateur.email,
+      role: this.roleVersNombre(utilisateur.role),
+      estActif: true
+    };
+
+    this.utilisateurService.modifierUtilisateur(utilisateur.id, donnees).subscribe({
+      next: () => {
+        this.message = `Le compte de "${utilisateur.nomComplet}" est activé.`;
+        this.chargerUtilisateurs();
+      },
+      error: (err) => {
+        console.error('Erreur :', err);
+        this.erreur = this.messageErreur(err, 'Impossible d\'activer ce compte.');
+      }
+    });
+  }
+
   modifier(utilisateur: Utilisateur): void {
     this.utilisateurEnEditionId = utilisateur.id;
     this.edition = {
       nomComplet: utilisateur.nomComplet,
       email: utilisateur.email,
-      role: utilisateur.role === 'Admin' ? 0 : 1,
+      role: this.roleVersNombre(utilisateur.role),
       estActif: utilisateur.estActif
     };
     this.erreur = '';
@@ -79,7 +127,7 @@ export class AdminUsersComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur :', err);
-        this.erreur = err?.error || 'Impossible de modifier cet utilisateur.';
+        this.erreur = this.messageErreur(err, 'Impossible de modifier cet utilisateur.');
       }
     });
   }
@@ -101,7 +149,7 @@ export class AdminUsersComponent implements OnInit {
       },
       error: (err) => {
         console.error('Erreur :', err);
-        this.erreur = 'Impossible de supprimer cet utilisateur.';
+        this.erreur = this.messageErreur(err, 'Impossible de supprimer cet utilisateur.');
       }
     });
   }

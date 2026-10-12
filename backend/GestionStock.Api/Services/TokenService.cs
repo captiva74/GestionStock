@@ -26,7 +26,8 @@ public class TokenService : ITokenService
             new(ClaimTypes.NameIdentifier, utilisateur.Id.ToString()),
             new(ClaimTypes.Email, utilisateur.Email),
             new(ClaimTypes.Role, utilisateur.Role.ToString()),
-            new("nomComplet", utilisateur.NomComplet)
+            new("nomComplet", utilisateur.NomComplet),
+            new("code_structure", utilisateur.CodeStructure.ToString())
         };
 
         var cleSecurite = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(cle));

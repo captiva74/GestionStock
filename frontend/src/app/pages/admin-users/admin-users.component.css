@@ -1,5 +1,5 @@
 .page {
-max-width: 1000px;
+max-width: 1250px;
 margin: 30px auto;
 padding: 24px;
 font-family: Arial, sans-serif;
@@ -157,4 +157,28 @@ margin-top: 12px;
   padding: 6px 10px;
   border: 1px solid #bdc7d1;
   border-radius: 5px;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 6px;
+  align-items: center;
+}
+
+.actions button {
+  width: auto;
+  margin: 0;
+  padding: 7px 12px;
+  font-size: 13px;
+  white-space: nowrap;
+}
+
+.actions .btn-danger {
+  background: #c62828;
+  color: #fff;
+}
+
+td {
+  vertical-align: middle;
 }
