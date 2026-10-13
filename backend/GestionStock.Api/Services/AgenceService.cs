@@ -21,7 +21,6 @@ public class AgenceService : IAgenceService
         {
             var http = _accessor.HttpContext;
             var user = http?.User;
-            Console.WriteLine($"[Agence] Admin={user?.IsInRole("Admin")} ; X-Agence={http?.Request.Headers["X-Agence"].FirstOrDefault()}");
 
             // Seul le siège (rôle Admin) peut consulter une autre agence
             if (user is not null && user.IsInRole("Admin"))

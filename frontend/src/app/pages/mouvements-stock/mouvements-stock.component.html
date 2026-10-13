@@ -226,12 +226,24 @@
             <td>{{ mouvement.motif || '—' }}</td>
 
             <td *ngIf="authService.estAdmin()" class="colonne-actions">
-              <button
-                type="button"
-                (click)="supprimerMouvement(mouvement)"
-                class="bouton-supprimer">
-                Supprimer
-              </button>
+              <div class="actions-ligne">
+                <button
+                  type="button"
+                  (click)="ouvrirBon(mouvement)"
+                  class="bouton-bon"
+                  [title]="mouvement.typeMouvement === TypeMouvementStock.Entree
+                    ? 'Bon d\'entrée'
+                    : 'Bon de sortie'">
+                  📄
+                </button>
+
+                <button
+                  type="button"
+                  (click)="supprimerMouvement(mouvement)"
+                  class="bouton-supprimer">
+                  Supprimer
+                </button>
+              </div>
             </td>
 
           </tr>
@@ -299,5 +311,90 @@
       Aucun mouvement enregistré.
     </p>
 
+  </div>
+
+    <!-- FENÊTRE : BON D'ENTRÉE / BON DE SORTIE -->
+  <div class="bon-fond" *ngIf="bonOuvert && mouvementBon">
+    <div class="bon-fenetre">
+      <h3>{{ estBonEntree ? "Bon d'entrée" : 'Bon de sortie' }} n° {{ numeroBon }}</h3>
+
+      <div class="bon-resume">
+        <p><strong>Date :</strong> {{ mouvementBon.dateMouvement | date:'dd/MM/yyyy' }}</p>
+        <p><strong>Article :</strong> {{ mouvementBon.article?.nom ?? 'N/A' }} ({{ mouvementBon.article?.reference ?? 'N/A' }})</p>
+        <p><strong>Quantité :</strong> {{ mouvementBon.quantite }}</p>
+        <p *ngIf="estBonEntree && mouvementBon.fournisseur">
+          <strong>Fournisseur :</strong>
+          {{ mouvementBon.fournisseur.nom }} {{ mouvementBon.fournisseur.prenom }}
+        </p>
+      </div>
+
+      <form (ngSubmit)="imprimerBon()">
+
+        <!-- BON D'ENTRÉE -->
+        <ng-container *ngIf="estBonEntree">
+          <div class="champ">
+            <label for="bonCommande">Bon de commande n°</label>
+            <input id="bonCommande" name="bonCommande" type="text" [(ngModel)]="bon.bonCommande">
+          </div>
+          <div class="champ">
+            <label for="facture">Facture n°</label>
+            <input id="facture" name="facture" type="text" [(ngModel)]="bon.facture">
+          </div>
+          <div class="champ">
+            <label for="bonLivraison">Bon de livraison</label>
+            <input id="bonLivraison" name="bonLivraison" type="text" [(ngModel)]="bon.bonLivraison">
+          </div>
+          <div class="champ">
+            <label for="nomLivreur">Nom du livreur</label>
+            <input id="nomLivreur" name="nomLivreur" type="text" [(ngModel)]="bon.nomLivreur">
+          </div>
+          <div class="champ">
+            <label for="nomMagasinier">Nom du magasinier</label>
+            <input id="nomMagasinier" name="nomMagasinier" type="text" [(ngModel)]="bon.nomMagasinier">
+          </div>
+        </ng-container>
+
+        <!-- BON DE SORTIE -->
+        <ng-container *ngIf="!estBonEntree">
+          <div class="champ">
+            <label for="beneficiaire">Nom du bénéficiaire</label>
+            <input id="beneficiaire" name="beneficiaire" type="text" [(ngModel)]="bon.beneficiaire">
+          </div>
+          <div class="champ">
+            <label for="demandeNumero">Demande d'approvisionnement n°</label>
+            <input id="demandeNumero" name="demandeNumero" type="text" [(ngModel)]="bon.demandeNumero">
+          </div>
+          <div class="champ">
+            <label for="demandeDate">Date de la demande</label>
+            <input id="demandeDate" name="demandeDate" type="date" [(ngModel)]="bon.demandeDate">
+          </div>
+          <div class="champ">
+            <label for="preneurNom">Preneur : nom</label>
+            <input id="preneurNom" name="preneurNom" type="text" [(ngModel)]="bon.preneurNom">
+          </div>
+          <div class="champ">
+            <label for="preneurPrenom">Preneur : prénom</label>
+            <input id="preneurPrenom" name="preneurPrenom" type="text" [(ngModel)]="bon.preneurPrenom">
+          </div>
+          <div class="champ">
+            <label for="preneurQualite">Preneur : qualité</label>
+            <input id="preneurQualite" name="preneurQualite" type="text" [(ngModel)]="bon.preneurQualite">
+          </div>
+          <div class="champ">
+            <label for="magasinierNom">Magasinier : nom</label>
+            <input id="magasinierNom" name="magasinierNom" type="text" [(ngModel)]="bon.magasinierNom">
+          </div>
+          <div class="champ">
+            <label for="magasinierPrenom">Magasinier : prénom</label>
+            <input id="magasinierPrenom" name="magasinierPrenom" type="text" [(ngModel)]="bon.magasinierPrenom">
+          </div>
+        </ng-container>
+
+        <div class="bon-actions">
+          <button type="button" (click)="fermerBon()">Annuler</button>
+          <button type="submit">Imprimer</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>

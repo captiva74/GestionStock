@@ -13,7 +13,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
 
     // Le siège peut consulter une autre agence (le serveur revérifie le rôle)
     const agence = authService.getAgenceChoisie();
-    console.log('Agence envoyee :', agence);
     if (agence !== null) {
       entetes['X-Agence'] = String(agence);
     }
