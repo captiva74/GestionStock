@@ -76,6 +76,11 @@ export const routes: Routes = [
     component: AdminUsersComponent,
     canActivate: [authGuard, adminGuard]
   },
+    {
+    path: 'parametres',
+    component: ProfileComponent,
+    canActivate: [authGuard]
+  },
   {
     path: 'profil',
     component: ProfileComponent,
