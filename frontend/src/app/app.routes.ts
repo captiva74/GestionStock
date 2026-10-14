@@ -77,6 +77,11 @@ export const routes: Routes = [
     canActivate: [authGuard, adminGuard]
   },
   {
+    path: 'profil',
+    component: ProfileComponent,
+    canActivate: [authGuard]
+  },
+  {
     path: '',
     redirectTo: 'articles',
     pathMatch: 'full'
